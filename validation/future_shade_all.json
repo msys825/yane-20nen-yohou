@@ -1,0 +1,1725 @@
+{
+ "1": {
+  "kwh_now": 4089,
+  "kwh_future": 4038,
+  "change": -0.012,
+  "kw": 4.32,
+  "volumes": [
+   {
+    "k": 28741,
+    "gml_id": "bldg_d89d01f2-b604-43bf-be50-79ad69fd59c9",
+    "now_h": 6.53,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 15.9,
+    "bearing": 130,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 28743,
+    "gml_id": "bldg_f326ce47-8769-47c4-b42a-a68c5d2b1e63",
+    "now_h": 6.48,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 12.4,
+    "bearing": 156,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "2": {
+  "kwh_now": 0,
+  "kwh_future": 0,
+  "change": 0.0,
+  "kw": 0.0,
+  "volumes": [
+   {
+    "k": 45927,
+    "gml_id": "bldg_0a1e9152-b393-4ecd-b8ca-0acb3d26b845",
+    "now_h": 7.91,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 20.7,
+    "bearing": 118,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 45982,
+    "gml_id": "bldg_2d8b067e-c25d-4ad8-97df-2a4ce78c284e",
+    "now_h": 7.33,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 12.4,
+    "bearing": 169,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46039,
+    "gml_id": "bldg_598d4405-4ba9-4afe-8fcb-7159818bc7bb",
+    "now_h": 7.19,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 6.1,
+    "bearing": 170,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46168,
+    "gml_id": "bldg_b49feb57-c669-4685-8849-1e8b122a6ed3",
+    "now_h": 9.69,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 20.7,
+    "bearing": 225,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46222,
+    "gml_id": "bldg_de8c4409-1cd6-44f2-8660-d21e5c6c0e6c",
+    "now_h": 9.61,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 18.8,
+    "bearing": 238,
+    "zone": "近隣商業地域"
+   }
+  ]
+ },
+ "3": {
+  "kwh_now": 10496,
+  "kwh_future": 10496,
+  "change": 0.0,
+  "kw": 12.13,
+  "volumes": []
+ },
+ "4": {
+  "kwh_now": 9649,
+  "kwh_future": 9649,
+  "change": 0.0,
+  "kw": 9.73,
+  "volumes": []
+ },
+ "5": {
+  "kwh_now": 5156,
+  "kwh_future": 5156,
+  "change": 0.0,
+  "kw": 5.21,
+  "volumes": []
+ },
+ "6": {
+  "kwh_now": 1391,
+  "kwh_future": 614,
+  "change": -0.559,
+  "kw": 2.02,
+  "volumes": [
+   {
+    "k": 51258,
+    "gml_id": "bldg_162d0da2-4385-46a7-aed7-7914e0d0bb57",
+    "now_h": 13.35,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 11.0,
+    "bearing": 168,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51260,
+    "gml_id": "bldg_17b64580-2922-4958-8df0-30f6727ffe2e",
+    "now_h": 6.91,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 28.4,
+    "bearing": 241,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51306,
+    "gml_id": "bldg_33028d79-fd27-4c8c-933c-af57adb475de",
+    "now_h": 9.63,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 28.2,
+    "bearing": 174,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51357,
+    "gml_id": "bldg_5883ed73-9b27-4654-9c56-3a1fc19247f1",
+    "now_h": 7.23,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 7.4,
+    "bearing": 253,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51377,
+    "gml_id": "bldg_67eb88dd-a197-4944-89e3-a81d0bb07d9e",
+    "now_h": 7.92,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 26.9,
+    "bearing": 187,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51386,
+    "gml_id": "bldg_6dbbcfe8-73c9-4987-b70a-375dda28b9d9",
+    "now_h": 8.14,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 27.3,
+    "bearing": 109,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51389,
+    "gml_id": "bldg_71ae24fb-ec68-4d93-bc2a-d83035780530",
+    "now_h": 4.84,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 17.2,
+    "bearing": 123,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51419,
+    "gml_id": "bldg_85e5c893-7243-46b2-90d1-cb092d9e3307",
+    "now_h": 11.76,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 12.6,
+    "bearing": 206,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51483,
+    "gml_id": "bldg_c1ea5990-d6cd-4a7e-9f59-5cd458f37c87",
+    "now_h": 8.23,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 13.5,
+    "bearing": 136,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51492,
+    "gml_id": "bldg_cdd180f1-5aec-4559-86e5-65c6c077fc84",
+    "now_h": 12.12,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 27.6,
+    "bearing": 164,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51503,
+    "gml_id": "bldg_d880df4d-47de-495f-94b8-71e8d3f8b554",
+    "now_h": 6.35,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 22.7,
+    "bearing": 229,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51510,
+    "gml_id": "bldg_e0a39afd-b061-4a50-9848-45bf4c4e56ea",
+    "now_h": 13.25,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 29.6,
+    "bearing": 150,
+    "zone": "商業地域"
+   }
+  ]
+ },
+ "7": {
+  "kwh_now": 1377,
+  "kwh_future": 1377,
+  "change": 0.0,
+  "kw": 1.8,
+  "volumes": [
+   {
+    "k": 81096,
+    "gml_id": "bldg_2782e4af-c672-461b-ada3-79a335600bfa",
+    "now_h": 3.6,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 27.0,
+    "bearing": 185,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "8": {
+  "kwh_now": 778,
+  "kwh_future": 726,
+  "change": -0.067,
+  "kw": 1.2,
+  "volumes": [
+   {
+    "k": 43892,
+    "gml_id": "bldg_8587374e-22f3-4fc5-b59c-24698c62f79f",
+    "now_h": 4.4,
+    "max_h": 9.0,
+    "why": "容積率300%÷建ぺい率80%＝3階相当",
+    "distance_m": 18.8,
+    "bearing": 163,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 44682,
+    "gml_id": "bldg_b84c591b-8af1-4dd0-8e69-ac08138cc190",
+    "now_h": 5.59,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 10.8,
+    "bearing": 227,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "9": {
+  "kwh_now": 2178,
+  "kwh_future": 2178,
+  "change": 0.0,
+  "kw": 1.96,
+  "volumes": [
+   {
+    "k": 78449,
+    "gml_id": "bldg_b191963f-cc6e-4b33-b367-53c12b94cb0d",
+    "now_h": 2.86,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 25.5,
+    "bearing": 208,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "10": {
+  "kwh_now": 2604,
+  "kwh_future": 2604,
+  "change": 0.0,
+  "kw": 4.23,
+  "volumes": []
+ },
+ "11": {
+  "kwh_now": 4279,
+  "kwh_future": 3111,
+  "change": -0.273,
+  "kw": 4.63,
+  "volumes": [
+   {
+    "k": 51023,
+    "gml_id": "bldg_f98385e0-3af9-4097-a302-fcd028436542",
+    "now_h": 7.9,
+    "max_h": 15.0,
+    "why": "容積率300%÷建ぺい率60%＝5階相当",
+    "distance_m": 26.9,
+    "bearing": 140,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51325,
+    "gml_id": "bldg_3f5c1c8b-d636-4e79-bdc7-1c961cf7aaa5",
+    "now_h": 6.46,
+    "max_h": 21.0,
+    "why": "容積率600%÷建ぺい率80%＝7階相当",
+    "distance_m": 7.7,
+    "bearing": 167,
+    "zone": "商業地域"
+   }
+  ]
+ },
+ "12": {
+  "kwh_now": 825,
+  "kwh_future": 703,
+  "change": -0.148,
+  "kw": 0.94,
+  "volumes": [
+   {
+    "k": 34869,
+    "gml_id": "bldg_07d45c9c-4660-49dd-99d8-a122cd33d209",
+    "now_h": 7.3,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 29.7,
+    "bearing": 178,
+    "zone": "準住居地域"
+   },
+   {
+    "k": 34910,
+    "gml_id": "bldg_fa3fc563-5c36-4552-9c8c-838c43e2db54",
+    "now_h": 7.8,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 11.8,
+    "bearing": 258,
+    "zone": "準住居地域"
+   },
+   {
+    "k": 34914,
+    "gml_id": "bldg_ffaa20bd-96ea-42e6-8de9-116ae0d53c4c",
+    "now_h": 7.1,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 27.9,
+    "bearing": 199,
+    "zone": "準住居地域"
+   }
+  ]
+ },
+ "13": {
+  "kwh_now": 5544,
+  "kwh_future": 5465,
+  "change": -0.014,
+  "kw": 7.1,
+  "volumes": [
+   {
+    "k": 81447,
+    "gml_id": "bldg_26baf9ef-d6ef-49b9-a7b2-2860549ca77d",
+    "now_h": 2.7199999999999998,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 15.2,
+    "bearing": 173,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 81557,
+    "gml_id": "bldg_c7614eb7-bf86-4582-a9fb-6457a8db9eae",
+    "now_h": 3.79,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 8.9,
+    "bearing": 221,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "14": {
+  "kwh_now": 754,
+  "kwh_future": 754,
+  "change": 0.0,
+  "kw": 3.05,
+  "volumes": [
+   {
+    "k": 66619,
+    "gml_id": "bldg_c4ca71f2-7b94-43bb-bf4a-51552d4fb6d1",
+    "now_h": 5.64,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 25.4,
+    "bearing": 154,
+    "zone": "商業地域"
+   }
+  ]
+ },
+ "15": {
+  "kwh_now": 4792,
+  "kwh_future": 2644,
+  "change": -0.448,
+  "kw": 4.45,
+  "volumes": [
+   {
+    "k": 116369,
+    "gml_id": "bldg_11d60271-f42e-4407-9254-c58a4b230c3e",
+    "now_h": 8,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 27.7,
+    "bearing": 154,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116373,
+    "gml_id": "bldg_213c97c7-5764-463e-b4a1-e78ed2194208",
+    "now_h": 2.75,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 18.3,
+    "bearing": 145,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116376,
+    "gml_id": "bldg_3f2b6cf6-5541-4cf5-9a98-8f0ee453a2b1",
+    "now_h": 8.61,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 23.6,
+    "bearing": 231,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116381,
+    "gml_id": "bldg_55aa7ac9-a8d5-4dd1-b708-8e89068297e5",
+    "now_h": 5.22,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 14.8,
+    "bearing": 187,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116393,
+    "gml_id": "bldg_a7b1f24b-8a78-4f26-bf02-27019b63ebb7",
+    "now_h": 7.83,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 17.6,
+    "bearing": 204,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116397,
+    "gml_id": "bldg_c9d1a7d6-82bd-4240-be46-155bc47c9eec",
+    "now_h": 8.6,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 13.5,
+    "bearing": 139,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116441,
+    "gml_id": "bldg_20defcb5-3cb5-4e8d-9d11-f20aa6b74286",
+    "now_h": 1.8399999999999999,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 22.7,
+    "bearing": 259,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116539,
+    "gml_id": "bldg_87eb0c99-73f1-4d7f-b128-fcab775ac9e5",
+    "now_h": 7.29,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 9.9,
+    "bearing": 253,
+    "zone": "第1種中高層住居専用地域"
+   }
+  ]
+ },
+ "16": {
+  "kwh_now": 3466,
+  "kwh_future": 2966,
+  "change": -0.144,
+  "kw": 5.73,
+  "volumes": [
+   {
+    "k": 27335,
+    "gml_id": "bldg_4b14d1a7-6e93-4bba-935f-a4ac01115740",
+    "now_h": 3.08,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 8.3,
+    "bearing": 174,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "17": {
+  "kwh_now": 3501,
+  "kwh_future": 3501,
+  "change": 0.0,
+  "kw": 3.41,
+  "volumes": []
+ },
+ "18": {
+  "kwh_now": 11746,
+  "kwh_future": 11746,
+  "change": 0.0,
+  "kw": 10.56,
+  "volumes": []
+ },
+ "19": {
+  "kwh_now": 4495,
+  "kwh_future": 4495,
+  "change": 0.0,
+  "kw": 7.21,
+  "volumes": []
+ },
+ "20": {
+  "kwh_now": 725,
+  "kwh_future": 725,
+  "change": 0.0,
+  "kw": 1.01,
+  "volumes": [
+   {
+    "k": 108660,
+    "gml_id": "bldg_5f0e6b33-5a8a-432a-87e4-b999f8460869",
+    "now_h": 2.27,
+    "max_h": 9.0,
+    "why": "容積率300%÷建ぺい率80%＝3階相当",
+    "distance_m": 25.4,
+    "bearing": 169,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "21": {
+  "kwh_now": 1157,
+  "kwh_future": 1010,
+  "change": -0.127,
+  "kw": 1.42,
+  "volumes": [
+   {
+    "k": 45966,
+    "gml_id": "bldg_1ea07b03-fbd5-462e-8895-3b3aa3eb2892",
+    "now_h": 5.74,
+    "max_h": 9.0,
+    "why": "容積率300%÷建ぺい率80%＝3階相当",
+    "distance_m": 10.6,
+    "bearing": 171,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 45991,
+    "gml_id": "bldg_346e4326-fade-437b-bbd5-6544480ba67a",
+    "now_h": 8.92,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 12.3,
+    "bearing": 144,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46023,
+    "gml_id": "bldg_50a7534b-acee-4fdb-b0f2-8d5f580f32ce",
+    "now_h": 11.09,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 25.1,
+    "bearing": 151,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46033,
+    "gml_id": "bldg_5737715c-416f-4ae4-b8f6-5b0291086bff",
+    "now_h": 7.77,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 24.5,
+    "bearing": 119,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46112,
+    "gml_id": "bldg_8f3918e0-b1af-4f5e-9e40-ca3db188e8e5",
+    "now_h": 5.82,
+    "max_h": 9.0,
+    "why": "容積率300%÷建ぺい率80%＝3階相当",
+    "distance_m": 11.0,
+    "bearing": 191,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46151,
+    "gml_id": "bldg_ab6bd912-f771-45f7-a793-52ea84c50f61",
+    "now_h": 7.68,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 18.6,
+    "bearing": 132,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46273,
+    "gml_id": "bldg_fb9e7ce1-6f39-45f9-b1f8-130b6390acc4",
+    "now_h": 8.24,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 20.0,
+    "bearing": 105,
+    "zone": "近隣商業地域"
+   }
+  ]
+ },
+ "22": {
+  "kwh_now": 0,
+  "kwh_future": 0,
+  "change": 0.0,
+  "kw": 0.0,
+  "volumes": [
+   {
+    "k": 119074,
+    "gml_id": "bldg_4e4dd98f-8437-4f30-a842-e009e19f0035",
+    "now_h": 8.4,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 15.4,
+    "bearing": 220,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 119085,
+    "gml_id": "bldg_690903f5-fcd9-4e00-bfdc-63995fbab00e",
+    "now_h": 7.99,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 5.3,
+    "bearing": 146,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 119136,
+    "gml_id": "bldg_ff2e69c6-cf6e-4875-ae04-eecebbb19118",
+    "now_h": 4.69,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 12.4,
+    "bearing": 157,
+    "zone": "第1種中高層住居専用地域"
+   }
+  ]
+ },
+ "23": {
+  "kwh_now": 2153,
+  "kwh_future": 1766,
+  "change": -0.18,
+  "kw": 2.45,
+  "volumes": [
+   {
+    "k": 116413,
+    "gml_id": "bldg_032be748-0512-4cc3-b2c4-31e3c460d674",
+    "now_h": 3.46,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 25.7,
+    "bearing": 194,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116435,
+    "gml_id": "bldg_16c4edba-2afa-4b0e-97a4-e59310679a4a",
+    "now_h": 3.92,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 16.7,
+    "bearing": 176,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116467,
+    "gml_id": "bldg_3998fc54-d7de-427c-99f0-2cd6f83b7888",
+    "now_h": 10.91,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 26.0,
+    "bearing": 227,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116480,
+    "gml_id": "bldg_4c2c0860-1b56-4779-93a0-82ee4f1a7232",
+    "now_h": 10.19,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 21.9,
+    "bearing": 118,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116516,
+    "gml_id": "bldg_7064fbe9-520a-4e5c-ad49-10f81d09d9f7",
+    "now_h": 2.95,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 26.8,
+    "bearing": 128,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116530,
+    "gml_id": "bldg_800bc2ea-e36b-4366-b558-9117181a585f",
+    "now_h": 11.53,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 29.5,
+    "bearing": 214,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116534,
+    "gml_id": "bldg_8569c388-a865-4af0-a98a-433c6c9c219e",
+    "now_h": 7.73,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 16.7,
+    "bearing": 195,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116553,
+    "gml_id": "bldg_93af05fc-2869-46f1-b466-b5bbb26f7b4a",
+    "now_h": 7.42,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 29.3,
+    "bearing": 253,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116568,
+    "gml_id": "bldg_a37466e4-0c15-49ef-9699-b5b4b140bf4d",
+    "now_h": 6.04,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 7.7,
+    "bearing": 115,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116589,
+    "gml_id": "bldg_be5d60eb-98bf-43af-a0a9-7dca2d7e73b0",
+    "now_h": 7.02,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 26.8,
+    "bearing": 155,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116594,
+    "gml_id": "bldg_c525f100-946d-4d3e-8c9b-5f3284c375b7",
+    "now_h": 2.85,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 25.4,
+    "bearing": 167,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116607,
+    "gml_id": "bldg_d876ad81-011c-4379-babf-8343f751a947",
+    "now_h": 2.77,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 11.4,
+    "bearing": 235,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116609,
+    "gml_id": "bldg_d9456c98-6082-47ed-835d-c827a45d2ea5",
+    "now_h": 6.78,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 24.1,
+    "bearing": 256,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116615,
+    "gml_id": "bldg_deaf98ef-de35-4ae9-814f-1d3e97be8bbd",
+    "now_h": 6.93,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 16.2,
+    "bearing": 149,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116646,
+    "gml_id": "bldg_f801c2a9-3cdf-44c4-953d-b50e54884033",
+    "now_h": 3.17,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 10.5,
+    "bearing": 143,
+    "zone": "第1種中高層住居専用地域"
+   }
+  ]
+ },
+ "24": {
+  "kwh_now": 2955,
+  "kwh_future": 2769,
+  "change": -0.063,
+  "kw": 4.41,
+  "volumes": [
+   {
+    "k": 45969,
+    "gml_id": "bldg_22339175-8e31-4f78-a81f-fe4335e29cc4",
+    "now_h": 14.74,
+    "max_h": 21.0,
+    "why": "容積率600%÷建ぺい率80%＝7階相当",
+    "distance_m": 11.0,
+    "bearing": 117,
+    "zone": "商業地域"
+   },
+   {
+    "k": 46007,
+    "gml_id": "bldg_40b86997-17ed-4ff5-95d9-8f7443bf6248",
+    "now_h": 1.42,
+    "max_h": 21.0,
+    "why": "容積率600%÷建ぺい率80%＝7階相当",
+    "distance_m": 8.8,
+    "bearing": 192,
+    "zone": "商業地域"
+   },
+   {
+    "k": 46008,
+    "gml_id": "bldg_4172d382-cdc2-4bc2-bb86-dafa21ec7510",
+    "now_h": 10.62,
+    "max_h": 21.0,
+    "why": "容積率600%÷建ぺい率80%＝7階相当",
+    "distance_m": 15.6,
+    "bearing": 226,
+    "zone": "商業地域"
+   },
+   {
+    "k": 46256,
+    "gml_id": "bldg_f551b0c9-308d-49db-bc54-979f8d375377",
+    "now_h": 9.97,
+    "max_h": 21.0,
+    "why": "容積率600%÷建ぺい率80%＝7階相当",
+    "distance_m": 24.7,
+    "bearing": 250,
+    "zone": "商業地域"
+   }
+  ]
+ },
+ "25": {
+  "kwh_now": 6405,
+  "kwh_future": 5344,
+  "change": -0.166,
+  "kw": 6.28,
+  "volumes": [
+   {
+    "k": 50408,
+    "gml_id": "bldg_cd4a76a4-18d6-4c4b-9291-c6799dfe5e63",
+    "now_h": 6,
+    "max_h": 9.0,
+    "why": "容積率300%÷建ぺい率80%＝3階相当",
+    "distance_m": 13.1,
+    "bearing": 191,
+    "zone": "商業地域"
+   },
+   {
+    "k": 50643,
+    "gml_id": "bldg_f209993f-a4c2-4a61-8254-45e651e53084",
+    "now_h": 5.3,
+    "max_h": 9.0,
+    "why": "容積率300%÷建ぺい率80%＝3階相当",
+    "distance_m": 23.9,
+    "bearing": 197,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51254,
+    "gml_id": "bldg_11af5a1a-a4a9-4437-a09a-290d7153abbd",
+    "now_h": 2.3,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 6.3,
+    "bearing": 118,
+    "zone": "商業地域"
+   }
+  ]
+ },
+ "26": {
+  "kwh_now": 2127,
+  "kwh_future": 1126,
+  "change": -0.471,
+  "kw": 1.94,
+  "volumes": [
+   {
+    "k": 50408,
+    "gml_id": "bldg_cd4a76a4-18d6-4c4b-9291-c6799dfe5e63",
+    "now_h": 6,
+    "max_h": 9.0,
+    "why": "容積率300%÷建ぺい率80%＝3階相当",
+    "distance_m": 27.5,
+    "bearing": 194,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51254,
+    "gml_id": "bldg_11af5a1a-a4a9-4437-a09a-290d7153abbd",
+    "now_h": 2.3,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 16.9,
+    "bearing": 175,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51270,
+    "gml_id": "bldg_1c31897a-ec54-4634-b7cc-768b8ee77d51",
+    "now_h": 7.6,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 14.4,
+    "bearing": 151,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51318,
+    "gml_id": "bldg_39af3860-e999-46cc-a97b-18d866ec2aa4",
+    "now_h": 7.17,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 10.2,
+    "bearing": 259,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51321,
+    "gml_id": "bldg_3c156ff6-4a08-438b-9318-7108a2ccb037",
+    "now_h": 6.3,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 18.0,
+    "bearing": 220,
+    "zone": "商業地域"
+   },
+   {
+    "k": 51537,
+    "gml_id": "bldg_fa8f912b-3ceb-4288-ac9c-a99e6c8eeaa0",
+    "now_h": 9.39,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 14.4,
+    "bearing": 196,
+    "zone": "商業地域"
+   }
+  ]
+ },
+ "27": {
+  "kwh_now": 2734,
+  "kwh_future": 2734,
+  "change": 0.0,
+  "kw": 3.29,
+  "volumes": [
+   {
+    "k": 44590,
+    "gml_id": "bldg_29c663ed-04a1-4643-8a8d-b0be5e46d438",
+    "now_h": 7,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 12.6,
+    "bearing": 244,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 44670,
+    "gml_id": "bldg_a8872821-8a8a-4c80-931c-54076433edd2",
+    "now_h": 6.63,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 29.8,
+    "bearing": 196,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "28": {
+  "kwh_now": 1262,
+  "kwh_future": 1262,
+  "change": 0.0,
+  "kw": 2.17,
+  "volumes": []
+ },
+ "29": {
+  "kwh_now": 2928,
+  "kwh_future": 1560,
+  "change": -0.467,
+  "kw": 3.31,
+  "volumes": [
+   {
+    "k": 45970,
+    "gml_id": "bldg_2317632b-2de9-44d9-aaac-a2a72d53a6b1",
+    "now_h": 9.27,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 16.0,
+    "bearing": 234,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 45995,
+    "gml_id": "bldg_36d748e4-a766-41da-9bcf-41ca38efc01e",
+    "now_h": 14.28,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 26.6,
+    "bearing": 161,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46013,
+    "gml_id": "bldg_457f2802-fc23-4f04-80be-ec32c68ab092",
+    "now_h": 6.91,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 11.6,
+    "bearing": 142,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46019,
+    "gml_id": "bldg_4a8817f3-9d8a-4475-af8e-264e9e1cf6b8",
+    "now_h": 12.13,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 26.1,
+    "bearing": 185,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46022,
+    "gml_id": "bldg_4dec54cf-ecc6-4121-9e16-a5afd281b395",
+    "now_h": 7.16,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 23.9,
+    "bearing": 246,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46037,
+    "gml_id": "bldg_58792b9a-80d4-4367-b2e7-4497c9e3887b",
+    "now_h": 7.06,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 10.5,
+    "bearing": 168,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46122,
+    "gml_id": "bldg_95caa840-59c9-4ed3-aff6-b014f23c9609",
+    "now_h": 6.91,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 11.3,
+    "bearing": 216,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46166,
+    "gml_id": "bldg_b499b498-6b9a-47f8-aeb5-7631916e7190",
+    "now_h": 11.84,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 23.2,
+    "bearing": 107,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46171,
+    "gml_id": "bldg_b7bbb61d-ff93-4308-9f65-01be52286f4f",
+    "now_h": 6.71,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 8.8,
+    "bearing": 199,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46179,
+    "gml_id": "bldg_bd34c704-3a23-4e08-bf2e-f3359c2b3b7c",
+    "now_h": 1.7000000000000002,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 19.9,
+    "bearing": 217,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46196,
+    "gml_id": "bldg_cbe3adae-b5a5-4cf3-a774-74b0fbb917a8",
+    "now_h": 1.8399999999999999,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 23.6,
+    "bearing": 228,
+    "zone": "近隣商業地域"
+   },
+   {
+    "k": 46242,
+    "gml_id": "bldg_ee1584a2-863d-4fb2-bf1b-2018e1fd3644",
+    "now_h": 5.67,
+    "max_h": 18.0,
+    "why": "容積率500%÷建ぺい率80%＝6階相当",
+    "distance_m": 18.8,
+    "bearing": 116,
+    "zone": "近隣商業地域"
+   }
+  ]
+ },
+ "30": {
+  "kwh_now": 3007,
+  "kwh_future": 2309,
+  "change": -0.232,
+  "kw": 4.07,
+  "volumes": [
+   {
+    "k": 116426,
+    "gml_id": "bldg_1112128d-0d43-42fa-a3c2-e919b9c0f610",
+    "now_h": 6.7,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 6.8,
+    "bearing": 160,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116525,
+    "gml_id": "bldg_788ed892-6ba8-4cf2-a196-9568683bdbe7",
+    "now_h": 7.89,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 29.3,
+    "bearing": 130,
+    "zone": "第1種中高層住居専用地域"
+   },
+   {
+    "k": 116596,
+    "gml_id": "bldg_c5f0dd4e-f750-4a68-a724-2feeeee13c53",
+    "now_h": 9.24,
+    "max_h": 15.0,
+    "why": "容積率400%÷建ぺい率80%＝5階相当",
+    "distance_m": 25.8,
+    "bearing": 222,
+    "zone": "第1種中高層住居専用地域"
+   }
+  ]
+ },
+ "31": {
+  "kwh_now": 12998,
+  "kwh_future": 12998,
+  "change": 0.0,
+  "kw": 12.76,
+  "volumes": []
+ },
+ "32": {
+  "kwh_now": 1334,
+  "kwh_future": 1334,
+  "change": 0.0,
+  "kw": 1.43,
+  "volumes": [
+   {
+    "k": 156016,
+    "gml_id": "bldg_082188c3-ea32-40ba-8542-1c53a337906a",
+    "now_h": 2.7,
+    "max_h": 6.0,
+    "why": "容積率100%÷建ぺい率50%＝2階相当",
+    "distance_m": 28.2,
+    "bearing": 113,
+    "zone": "第1種中高層住居専用地域"
+   }
+  ]
+ },
+ "33": {
+  "kwh_now": 3071,
+  "kwh_future": 3071,
+  "change": 0.0,
+  "kw": 2.95,
+  "volumes": []
+ },
+ "34": {
+  "kwh_now": 2262,
+  "kwh_future": 2262,
+  "change": 0.0,
+  "kw": 2.0,
+  "volumes": []
+ },
+ "35": {
+  "kwh_now": 1718,
+  "kwh_future": 1718,
+  "change": 0.0,
+  "kw": 2.03,
+  "volumes": []
+ },
+ "36": {
+  "kwh_now": 2812,
+  "kwh_future": 2812,
+  "change": 0.0,
+  "kw": 2.53,
+  "volumes": []
+ },
+ "37": {
+  "kwh_now": 1990,
+  "kwh_future": 1990,
+  "change": 0.0,
+  "kw": 1.93,
+  "volumes": []
+ },
+ "38": {
+  "kwh_now": 5556,
+  "kwh_future": 5556,
+  "change": 0.0,
+  "kw": 5.01,
+  "volumes": []
+ },
+ "39": {
+  "kwh_now": 1831,
+  "kwh_future": 1831,
+  "change": 0.0,
+  "kw": 1.81,
+  "volumes": []
+ },
+ "40": {
+  "kwh_now": 5938,
+  "kwh_future": 5938,
+  "change": 0.0,
+  "kw": 5.31,
+  "volumes": []
+ },
+ "41": {
+  "kwh_now": 1440,
+  "kwh_future": 1427,
+  "change": -0.009,
+  "kw": 1.55,
+  "volumes": [
+   {
+    "k": 93575,
+    "gml_id": "bldg_93b2735d-797d-4ae1-8b4c-2d7e15e8178d",
+    "now_h": 6.3,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 8.7,
+    "bearing": 104,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 93713,
+    "gml_id": "bldg_f220091e-2c80-4319-8f25-c821849a5c9b",
+    "now_h": 5.5,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 24.3,
+    "bearing": 210,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 94041,
+    "gml_id": "bldg_50267dc7-ca36-44f3-970f-6249b85e2f01",
+    "now_h": 5.4,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 27.2,
+    "bearing": 184,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 94395,
+    "gml_id": "bldg_b5016dad-d38e-40b7-9839-8963ccffe4c4",
+    "now_h": 6.9,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 17.9,
+    "bearing": 206,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "42": {
+  "kwh_now": 3485,
+  "kwh_future": 3474,
+  "change": -0.003,
+  "kw": 3.35,
+  "volumes": [
+   {
+    "k": 166693,
+    "gml_id": "bldg_2c17694b-9b6a-4034-b1a2-61e2b2470d3e",
+    "now_h": 6.5,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 23.7,
+    "bearing": 182,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 166707,
+    "gml_id": "bldg_a3e89646-b107-4d79-81ef-9214a760e0fa",
+    "now_h": 6.4,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 16.7,
+    "bearing": 199,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 166935,
+    "gml_id": "bldg_e50bf87c-b67f-4d3f-99fa-442284b2d208",
+    "now_h": 6.4,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 28.3,
+    "bearing": 220,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 167881,
+    "gml_id": "bldg_235ea758-bd9f-4d64-9d51-75c74a681dcb",
+    "now_h": 6.3,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 25.5,
+    "bearing": 195,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "43": {
+  "kwh_now": 4041,
+  "kwh_future": 4023,
+  "change": -0.004,
+  "kw": 3.72,
+  "volumes": [
+   {
+    "k": 110418,
+    "gml_id": "bldg_6b35eed7-7944-4b19-bd63-81509746d754",
+    "now_h": 6.8,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 22.0,
+    "bearing": 170,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 110466,
+    "gml_id": "bldg_071a5d86-9b32-4766-8f03-063b5041e703",
+    "now_h": 6.4,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 19.6,
+    "bearing": 192,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 110633,
+    "gml_id": "bldg_103aaa43-3f7b-470b-b3a8-a81fd5371d6e",
+    "now_h": 3.2,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 10.8,
+    "bearing": 203,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "44": {
+  "kwh_now": 866,
+  "kwh_future": 863,
+  "change": -0.003,
+  "kw": 0.89,
+  "volumes": [
+   {
+    "k": 130390,
+    "gml_id": "bldg_abcc6b51-01db-454e-8c81-d57845985aa7",
+    "now_h": 6.3,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 18.3,
+    "bearing": 183,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "45": {
+  "kwh_now": 6141,
+  "kwh_future": 6124,
+  "change": -0.003,
+  "kw": 5.86,
+  "volumes": [
+   {
+    "k": 4950,
+    "gml_id": "bldg_e8f7880f-21a5-4ab9-b03e-10f29508fd48",
+    "now_h": 6.7,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 15.0,
+    "bearing": 151,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 5170,
+    "gml_id": "bldg_5afb9004-601d-4cc3-9487-4fb03645c876",
+    "now_h": 2.6,
+    "max_h": 6.0,
+    "why": "容積率100%÷建ぺい率50%＝2階相当",
+    "distance_m": 29.0,
+    "bearing": 170,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "46": {
+  "kwh_now": 2559,
+  "kwh_future": 1781,
+  "change": -0.304,
+  "kw": 2.85,
+  "volumes": [
+   {
+    "k": 63097,
+    "gml_id": "bldg_216ec2a6-ab41-48a1-b0b8-3022cb00c9e6",
+    "now_h": 6.9,
+    "max_h": 15.0,
+    "why": "容積率300%÷建ぺい率60%＝5階相当",
+    "distance_m": 11.6,
+    "bearing": 203,
+    "zone": "準工業地域"
+   },
+   {
+    "k": 63314,
+    "gml_id": "bldg_4e438d99-fe8b-4a32-b951-a8ddd63c2413",
+    "now_h": 3.9,
+    "max_h": 9.0,
+    "why": "容積率200%÷建ぺい率60%＝3階相当",
+    "distance_m": 28.6,
+    "bearing": 259,
+    "zone": "準工業地域"
+   },
+   {
+    "k": 63890,
+    "gml_id": "bldg_d138d0e2-9709-475e-b011-90987b254cca",
+    "now_h": 2.8,
+    "max_h": 15.0,
+    "why": "容積率300%÷建ぺい率60%＝5階相当",
+    "distance_m": 7.3,
+    "bearing": 109,
+    "zone": "準工業地域"
+   },
+   {
+    "k": 63996,
+    "gml_id": "bldg_4e4ff5d9-27ef-45df-b83c-dae1539ae42d",
+    "now_h": 6.6,
+    "max_h": 15.0,
+    "why": "容積率300%÷建ぺい率60%＝5階相当",
+    "distance_m": 21.3,
+    "bearing": 138,
+    "zone": "準工業地域"
+   },
+   {
+    "k": 64089,
+    "gml_id": "bldg_7026fae4-a925-44fb-8034-71b71c560455",
+    "now_h": 6.7,
+    "max_h": 15.0,
+    "why": "容積率300%÷建ぺい率60%＝5階相当",
+    "distance_m": 19.1,
+    "bearing": 116,
+    "zone": "準工業地域"
+   },
+   {
+    "k": 64242,
+    "gml_id": "bldg_34ba5e1f-1a5f-43cb-ae7a-dca2b37ff6b2",
+    "now_h": 2,
+    "max_h": 15.0,
+    "why": "容積率300%÷建ぺい率60%＝5階相当",
+    "distance_m": 25.1,
+    "bearing": 109,
+    "zone": "準工業地域"
+   }
+  ]
+ },
+ "47": {
+  "kwh_now": 693,
+  "kwh_future": 562,
+  "change": -0.189,
+  "kw": 0.94,
+  "volumes": [
+   {
+    "k": 151586,
+    "gml_id": "bldg_942afbd3-ccb3-4db5-88eb-a1ba42c28e8f",
+    "now_h": 2,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 28.6,
+    "bearing": 163,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 151985,
+    "gml_id": "bldg_dd30d3cb-6e05-4927-b407-60dbb6d33a4f",
+    "now_h": 5.7,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 13.1,
+    "bearing": 128,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 152047,
+    "gml_id": "bldg_2164513f-ab28-46a7-8140-c2ef39a11ffc",
+    "now_h": 6.9,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 5.8,
+    "bearing": 260,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 152406,
+    "gml_id": "bldg_9fe47f30-027c-4f58-bc3a-213db04ba2f5",
+    "now_h": 6.7,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 28.8,
+    "bearing": 119,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "48": {
+  "kwh_now": 1630,
+  "kwh_future": 1630,
+  "change": 0.0,
+  "kw": 2.1,
+  "volumes": [
+   {
+    "k": 123368,
+    "gml_id": "bldg_845a5a8c-1514-41b6-8828-c3a1f38e2e9b",
+    "now_h": 4.3,
+    "max_h": 10.0,
+    "why": "第2種低層住居専用地域の高さの上限10m",
+    "distance_m": 18.4,
+    "bearing": 187,
+    "zone": "第2種低層住居専用地域"
+   },
+   {
+    "k": 123508,
+    "gml_id": "bldg_51aeba7f-5fee-4793-918b-4c7d95205786",
+    "now_h": 5.5,
+    "max_h": 10.0,
+    "why": "第2種低層住居専用地域の高さの上限10m",
+    "distance_m": 22.4,
+    "bearing": 187,
+    "zone": "第2種低層住居専用地域"
+   },
+   {
+    "k": 123656,
+    "gml_id": "bldg_827a9fc4-938a-4a12-a277-3a6d33444865",
+    "now_h": 6,
+    "max_h": 10.0,
+    "why": "第2種低層住居専用地域の高さの上限10m",
+    "distance_m": 28.6,
+    "bearing": 187,
+    "zone": "第2種低層住居専用地域"
+   }
+  ]
+ },
+ "49": {
+  "kwh_now": 0,
+  "kwh_future": 0,
+  "change": 0.0,
+  "kw": 0.0,
+  "volumes": [
+   {
+    "k": 78932,
+    "gml_id": "bldg_38ab9002-986e-46ee-a9e5-be4424ad2d23",
+    "now_h": 3.8,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 26.6,
+    "bearing": 215,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 79271,
+    "gml_id": "bldg_63c076a8-9a8a-45c9-8429-376eb231735f",
+    "now_h": 7,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 15.6,
+    "bearing": 156,
+    "zone": "第1種低層住居専用地域"
+   },
+   {
+    "k": 79414,
+    "gml_id": "bldg_271b6457-7efc-469d-bde6-9eafdc393374",
+    "now_h": 6.4,
+    "max_h": 10.0,
+    "why": "第1種低層住居専用地域の高さの上限10m",
+    "distance_m": 13.0,
+    "bearing": 188,
+    "zone": "第1種低層住居専用地域"
+   }
+  ]
+ },
+ "50": {
+  "kwh_now": 2107,
+  "kwh_future": 1893,
+  "change": -0.102,
+  "kw": 2.05,
+  "volumes": [
+   {
+    "k": 24794,
+    "gml_id": "bldg_1c1b5746-ffb9-49fd-88cb-c4b069d62d04",
+    "now_h": 2.9,
+    "max_h": 6.0,
+    "why": "容積率100%÷建ぺい率50%＝2階相当",
+    "distance_m": 8.0,
+    "bearing": 142,
+    "zone": null
+   },
+   {
+    "k": 24854,
+    "gml_id": "bldg_cbdcf719-43ca-4ad5-ab1f-e05d23c94bf2",
+    "now_h": 6.7,
+    "max_h": 15.0,
+    "why": "容積率300%÷建ぺい率60%＝5階相当",
+    "distance_m": 19.8,
+    "bearing": 180,
+    "zone": null
+   },
+   {
+    "k": 24896,
+    "gml_id": "bldg_9cb13d68-8e92-4663-af4d-4748dc459c6d",
+    "now_h": 7.7,
+    "max_h": 15.0,
+    "why": "容積率300%÷建ぺい率60%＝5階相当",
+    "distance_m": 21.4,
+    "bearing": 138,
+    "zone": null
+   },
+   {
+    "k": 24939,
+    "gml_id": "bldg_e8973e79-14f0-47f1-b1a9-01a014863f20",
+    "now_h": 8.6,
+    "max_h": 15.0,
+    "why": "容積率300%÷建ぺい率60%＝5階相当",
+    "distance_m": 21.9,
+    "bearing": 199,
+    "zone": null
+   },
+   {
+    "k": 24940,
+    "gml_id": "bldg_7eeb95d6-7606-49e5-afc1-2aeb93cf5403",
+    "now_h": 8.1,
+    "max_h": 15.0,
+    "why": "容積率300%÷建ぺい率60%＝5階相当",
+    "distance_m": 28.8,
+    "bearing": 188,
+    "zone": null
+   },
+   {
+    "k": 25023,
+    "gml_id": "bldg_b411d35b-b23b-4fb0-bc05-4d82b66705ea",
+    "now_h": 8.2,
+    "max_h": 15.0,
+    "why": "容積率300%÷建ぺい率60%＝5階相当",
+    "distance_m": 27.9,
+    "bearing": 232,
+    "zone": null
+   },
+   {
+    "k": 25051,
+    "gml_id": "bldg_16ff0212-f62b-4749-ab3f-3073ebdbdd47",
+    "now_h": 2.2,
+    "max_h": 15.0,
+    "why": "容積率300%÷建ぺい率60%＝5階相当",
+    "distance_m": 22.2,
+    "bearing": 169,
+    "zone": null
+   }
+  ]
+ }
+}

@@ -1,0 +1,65 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-04T20:45:00+09:00"
+  },
+  "lists": "css",
+  "title": "屋根の20年予報 ― その太陽光、20年後も得ですか？",
+  "cover": "cover",
+  "order": [
+    "cover",
+    "city",
+    "question",
+    "problem",
+    "gap",
+    "flip",
+    "solution",
+    "plateau",
+    "ward",
+    "future-shade",
+    "roof-auto",
+    "accuracy",
+    "pv-check",
+    "ai-advisor",
+    "ai-quote",
+    "principles",
+    "business",
+    "roadmap",
+    "data",
+    "closing"
+  ],
+  "sections": {
+    "s1": {
+      "description": "問い：建ちうる未来の街と、そっくりな2軒",
+      "start": "cover"
+    },
+    "s2": {
+      "description": "切り口：建てる側の道具を、建てられる側へ",
+      "start": "flip"
+    },
+    "s3": {
+      "description": "どの家でも予報でき、確かめてある",
+      "start": "ward"
+    },
+    "s4": {
+      "description": "AI：家族ごとの損得と、見積もりのセカンドオピニオン",
+      "start": "ai-advisor"
+    },
+    "s5": {
+      "description": "続け方とこれから",
+      "start": "business"
+    }
+  },
+  "faces": {
+    "zen-kaku-gothic-new": {
+      "family": "Zen Kaku Gothic New",
+      "href": "https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap"
+    },
+    "noto-sans-jp": {
+      "family": "Noto Sans JP",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap"
+    }
+  },
+  "designSystems": []
+}

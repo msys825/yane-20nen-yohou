@@ -1,0 +1,77 @@
+{
+ "year": 2025,
+ "hours": 8753,
+ "days": 365,
+ "area_capacity_gw": 20.32,
+ "station_weights_gw": {
+  "東京": 3.94,
+  "館野": 4.74,
+  "銚子": 3.59,
+  "宇都宮": 3.31,
+  "前橋": 3.95,
+  "甲府": 0.79
+ },
+ "annual_kwh_per_kw": {
+  "model": 1381,
+  "actual": 1276
+ },
+ "ratio_actual_to_model": 0.924,
+ "hourly_r": 0.993,
+ "daily_r": 0.988,
+ "monthly_kwh_per_kw": {
+  "1": {
+   "model": 106.7,
+   "actual": 95.9
+  },
+  "2": {
+   "model": 121.7,
+   "actual": 112.6
+  },
+  "3": {
+   "model": 113.8,
+   "actual": 109.5
+  },
+  "4": {
+   "model": 130.3,
+   "actual": 117.9
+  },
+  "5": {
+   "model": 117.9,
+   "actual": 103.5
+  },
+  "6": {
+   "model": 131.6,
+   "actual": 116.2
+  },
+  "7": {
+   "model": 153.7,
+   "actual": 142.4
+  },
+  "8": {
+   "model": 145.9,
+   "actual": 133.1
+  },
+  "9": {
+   "model": 113.4,
+   "actual": 107.0
+  },
+  "10": {
+   "model": 71.4,
+   "actual": 71.0
+  },
+  "11": {
+   "model": 87.7,
+   "actual": 86.5
+  },
+  "12": {
+   "model": 86.7,
+   "actual": 80.3
+  }
+ },
+ "assumptions": {
+  "tilt": 20.0,
+  "azimuth": 180.0,
+  "kpy": 0.85,
+  "albedo": 0.15
+ }
+}
