@@ -198,8 +198,8 @@ function yen(v: number) {
 
 function EconomicsCard({ e }: { e: EconomicsResult }) {
   const rows = [
-    ["よい場合", e.best],
-    ["きびしい場合", e.worst],
+    ["南が今のまま", e.best],
+    ["南に建ったら", e.worst],
   ] as const;
   return (
     <div className="mt-3 rounded-lg bg-amber-50 p-3 text-sm">
@@ -226,7 +226,7 @@ function EconomicsCard({ e }: { e: EconomicsResult }) {
       <details className="mt-1 text-xs text-neutral-600">
         <summary className="cursor-pointer">くわしく</summary>
         <p className="mt-1">
-          設置 {yen(e.investmentYen)} − 東京都の補助 {yen(e.subsidyYen)}。よい場合：{e.best.label}。きびしい場合：{e.worst.label}。
+          設置 {yen(e.investmentYen)} − 東京都の補助 {yen(e.subsidyYen)}。南が今のまま：{e.best.label}。南に建ったら：{e.worst.label}。
         </p>
         <ul className="mt-1 list-disc pl-4">
           {e.sources.map((s) => (

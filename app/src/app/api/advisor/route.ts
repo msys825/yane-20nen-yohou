@@ -16,7 +16,7 @@ const SYSTEM = `あなたは「屋根の20年予報」の相談役です。家�
 - 説明の根拠は、下の「この家の診断」と「計算結果」です。南側のどの建物が、今の高さから最大何mまで建ちうるか、など具体的に触れます。
 - 金額と年数を自分で作ったり、推測で計算したりしてはいけません。条件を変えた場合（電気自動車を買ったら、など）を聞かれたら、必ず calculate_economics を呼び、その値だけを使います。
 - 計算の道具で扱えないこと（蓄電池、屋根の修理、ローンなど）は、計算していないことをはっきり言い、確かめるべき点を伝えます。
-- 結果は「幅」で伝えます。よい場合ときびしい場合のどちらになるかは、誰にも分からないことを正直に伝えます。将来の影は「南側の建物がルール上の最大の高さまで建て替わった場合」の目安で、実際に建つとは限りません。
+- 結果は「幅」で伝えます。「南が今のまま」と「南に建ったら」のどちらになるかは、誰にも分からないことを正直に伝えます。将来の影は「南側の建物がルール上の最大の高さまで建て替わった場合」の目安で、実際に建つとは限りません。
 - 補助金や電気の単価などの前提は目安で、申請時点の公式の情報で確認が必要なことを、必要に応じて添えます。
 - 特定の業者や商品を勧めません。最終的に決めるのは持ち主です。
 
@@ -27,7 +27,7 @@ const TOOLS: Anthropic.Beta.BetaTool[] = [
   {
     name: "calculate_economics",
     description:
-      "家族の暮らし方から、この家に太陽光パネルを付けたときの20年の損得（元が取れる年数、20年間の損得）を、よい場合ときびしい場合の2通りで計算する。画面の条件と違う場合（電気自動車を買ったら、など）を聞かれたときに呼ぶ。",
+      "家族の暮らし方から、この家に太陽光パネルを付けたときの20年の損得（元が取れる年数、20年間の損得）を、「南が今のまま」と「南に建ったら」の2通りで計算する。画面の条件と違う場合（電気自動車を買ったら、など）を聞かれたときに呼ぶ。",
     strict: true,
     input_schema: {
       type: "object",
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
 - 月の電気代：${profile.monthlyBillYen}円／平日の昼：${PRESENCE_JA[profile.daytimePresence]}／電気自動車：${profile.evPlan ? "家で充電する予定あり" : "なし"}／家族：${profile.householdSize}人
 
 計算結果（calculate_economics と同じ道具で計算済み）
-${JSON.stringify({ 実際に払う額: base.netCostYen, 設置費用: base.investmentYen, 東京都の補助: base.subsidyYen, よい場合: base.best, きびしい場合: base.worst, 前提: base.sources })}
+${JSON.stringify({ 実際に払う額: base.netCostYen, 設置費用: base.investmentYen, 東京都の補助: base.subsidyYen, 南が今のまま: base.best, 南に建ったら: base.worst, 前提: base.sources })}
 `;
 
   const result = await runWithTools({
