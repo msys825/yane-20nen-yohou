@@ -617,10 +617,7 @@ function WardPanel(props: {
         {cityOn ? "今の街に戻す" : "20年後に建ちうる街を見る"}
       </button>
       {city && cityOn && (
-        <div className="grid grid-cols-2 gap-3">
-          <Stat label="高くなりうる建物" value={`${city.count.toLocaleString()}棟`} sub={`区内の${Math.round((city.count / city.candidates) * 100)}%`} />
-          <Stat label="増えうる体積" value={`東京ドーム${Math.round(city.addedVolumeM3 / 1240000)}杯`} />
-        </div>
+        <Stat label="高くなりうる建物" value={`${city.count.toLocaleString()}棟`} sub={`区内の${Math.round((city.count / city.candidates) * 100)}%`} />
       )}
       <More>
         <p>気をつけたい家＝南側がルール上の最大まで建て替わると、発電が1割以上減りうる家。</p>
