@@ -8,8 +8,8 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   // API（AI の相談・見積書）がサーバー側で読むファイルを、Vercel の実行環境に含める
   outputFileTracingIncludes: {
-    "/api/advisor": ["./public/data/houses/**"],
-    "/api/quote": ["./public/data/houses/**", "./public/samples/**"],
+    "/api/advisor": ["./public/data/houses/**", "./public/data/simple/**"],
+    "/api/quote": ["./public/data/houses/**", "./public/data/simple/**", "./public/samples/**"],
   },
 };
 

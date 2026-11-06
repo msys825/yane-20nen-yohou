@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { ASSUMPTIONS } from "@/lib/economics";
 import { runWithTools } from "@/lib/server/claude";
 import { isPublicDemo, takeAiQuota } from "@/lib/server/limits";
-import { diagnosisSummary, loadDiagnosis } from "@/lib/server/houses";
+import { loadHouseForAi, type HouseContext } from "@/lib/server/houses";
 
 export const runtime = "nodejs";
 
@@ -14,11 +14,11 @@ const SYSTEM = `あなたは「屋根の20年予報」のセカンドオピニ�
 進め方
 - 見積もりの画像やPDFから、パネルの容量（kW）、税込みの合計金額、業者が示した年間の想定発電量（kWh）、メーカーと型番、補助金を差し引いた金額かどうかを読み取り、必ず record_quote を呼びます。読めない項目は null にします。推測で埋めてはいけません。
 - 比べた結果は、record_quote が返した数字だけを使って説明します。
-- 中学生でも分かる、やさしい日本語で、短く伝えます。「業者の想定発電量が、この家の計算より何%多いか」「1kWあたりの価格が、全国の平均と比べてどうか」「将来の影が考慮されていそうか」の3点を中心にします。
-- 差が大きい場合は、業者に確認するとよい質問を2〜3個、具体的に挙げます。断定的に業者を非難せず、「確認しましょう」という言い方にします。
+- 中学生でも分かる、やさしい日本語で伝えます。全体で250字以内、箇条書きにし、見出しと表は使いません。「業者の想定発電量が、この家の計算より何%多いか」「1kWあたりの価格が、全国の平均と比べてどうか」「将来の影が考慮されていそうか」の3点を中心にします。
+- 差が大きい場合は、業者に確認するとよい質問を2つまで挙げます。断定的に業者を非難せず、「確認しましょう」という言い方にします。
 - 最後に、この比較は目安であり、現地調査の結果とは違う場合があることを一言添えます。
 
-この家の診断（PLATEAU と東京都の航空レーザー点群から計算済み）
+この家の診断（計算済み。「診断の種類」が簡易診断なら、屋根の形は仮定であることを必要に応じて伝える）
 `;
 
 const TOOLS: Anthropic.Beta.BetaTool[] = [
@@ -50,9 +50,9 @@ type Quote = {
 };
 
 export async function POST(req: Request) {
-  const body = (await req.json()) as { gmlId: string; sample?: boolean; fileBase64?: string; mediaType?: string };
-  const diagnosis = await loadDiagnosis(body.gmlId);
-  if (!diagnosis) return NextResponse.json({ error: "診断データが見つかりません" }, { status: 404 });
+  const body = (await req.json()) as { gmlId: string; sample?: boolean; fileBase64?: string; mediaType?: string; context?: HouseContext };
+  const house = await loadHouseForAi(body.gmlId, body.context);
+  if (!house) return NextResponse.json({ error: "診断データが見つかりません" }, { status: 404 });
   // 公開版では、知らない人の書類（個人情報を含みうる）を受け取らず、サンプルの見積書だけを読む
   if (isPublicDemo() && !body.sample) return NextResponse.json({ error: "公開版では、サンプルの見積書だけを試せます" }, { status: 400 });
   const limited = takeAiQuota(req);
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
         };
 
   const result = await runWithTools({
-    system: SYSTEM + diagnosisSummary(diagnosis),
+    system: SYSTEM + house.summary,
     messages: [{ role: "user", content: [fileBlock, { type: "text", text: "この見積もりをチェックしてください。" }] }],
     tools: TOOLS,
     effort: "medium",
@@ -83,9 +83,9 @@ export async function POST(req: Request) {
       record_quote: (raw) => {
         const q = raw as Quote;
         // この家の計算と同じ条件（1kWあたりの年間発電量）で比べる
-        const ourPerKw = diagnosis.now.kw ? diagnosis.now.kwh / diagnosis.now.kw : null;
+        const ourPerKw = house.kw ? house.kwhNow / house.kw : null;
         const ourKwhForQuote = q.system_kw && ourPerKw ? Math.round(q.system_kw * ourPerKw) : null;
-        const futurePerKw = diagnosis.now.kw ? diagnosis.future.kwh / diagnosis.now.kw : null;
+        const futurePerKw = house.kw ? house.kwhFuture / house.kw : null;
         return {
           quote: q,
           this_house: {
@@ -93,7 +93,7 @@ export async function POST(req: Request) {
             kwh_per_kw_future: futurePerKw && Math.round(futurePerKw),
             expected_kwh_for_quoted_kw_now: ourKwhForQuote,
             expected_kwh_for_quoted_kw_future: q.system_kw && futurePerKw ? Math.round(q.system_kw * futurePerKw) : null,
-            max_kw_on_this_roof: diagnosis.now.kw,
+            max_kw_on_this_roof: house.kw,
           },
           claimed_vs_ours_pct:
             q.claimed_annual_kwh && ourKwhForQuote ? Math.round((q.claimed_annual_kwh / ourKwhForQuote - 1) * 100) : null,

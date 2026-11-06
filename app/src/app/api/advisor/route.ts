@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { calculateEconomics, type HouseholdProfile } from "@/lib/economics";
 import { runWithTools } from "@/lib/server/claude";
 import { takeAiQuota } from "@/lib/server/limits";
-import { diagnosisSummary, loadDiagnosis } from "@/lib/server/houses";
+import { loadHouseForAi, type HouseContext } from "@/lib/server/houses";
 
 export const runtime = "nodejs";
 
@@ -11,7 +11,7 @@ const SYSTEM = `あなたは「屋根の20年予報」の相談役です。家�
 
 役割
 - 家族の暮らし方は、画面の選択肢ですでに入力され、損得はすでに計算されています（下の「計算結果」）。あなたの役割は、その結果を、この家族の言葉でやさしく説明し、続けての質問に答えることです。
-- 中学生でも分かる、やさしい日本語で、短く話します。最初の説明は300字以内にまとめ、細かいことは聞かれてから答えます。見出しや表は必要なときだけ使います。
+- 中学生でも分かる、やさしい日本語で、短く話します。最初の説明は、箇条書き3〜4行・150字以内にまとめます（結論→理由→次に確かめること）。見出しと表は使いません。続けての質問への答えも200字以内にし、細かいことは聞かれてから答えます。
 - 方角は「真南」「南東」「東」のように言葉で言い、「方位109°」のような数字は使いません。
 - 説明の根拠は、下の「この家の診断」と「計算結果」です。南側のどの建物が、今の高さから最大何mまで建ちうるか、など具体的に触れます。
 - 金額と年数を自分で作ったり、推測で計算したりしてはいけません。条件を変えた場合（電気自動車を買ったら、など）を聞かれたら、必ず calculate_economics を呼び、その値だけを使います。
@@ -20,7 +20,7 @@ const SYSTEM = `あなたは「屋根の20年予報」の相談役です。家�
 - 補助金や電気の単価などの前提は目安で、申請時点の公式の情報で確認が必要なことを、必要に応じて添えます。
 - 特定の業者や商品を勧めません。最終的に決めるのは持ち主です。
 
-この家の診断（PLATEAU と東京都の航空レーザー点群から計算済み）
+この家の診断（計算済み。「診断の種類」が簡易診断なら、屋根の形は仮定であることを必要に応じて伝える）
 `;
 
 const TOOLS: Anthropic.Beta.BetaTool[] = [
@@ -50,20 +50,21 @@ const TOOLS: Anthropic.Beta.BetaTool[] = [
 const PRESENCE_JA = { rarely: "ほとんどいない", sometimes: "時々いる", mostly: "ほとんどいる" } as const;
 
 export async function POST(req: Request) {
-  const { gmlId, profile, messages } = (await req.json()) as {
+  const { gmlId, profile, messages, context } = (await req.json()) as {
     gmlId: string;
     profile: HouseholdProfile;
     messages: Anthropic.Beta.BetaMessageParam[];
+    context?: HouseContext;
   };
-  const diagnosis = await loadDiagnosis(gmlId);
-  if (!diagnosis) return NextResponse.json({ error: "診断データが見つかりません" }, { status: 404 });
+  const house = await loadHouseForAi(gmlId, context);
+  if (!house) return NextResponse.json({ error: "診断データが見つかりません" }, { status: 404 });
   if (!profile || !(profile.daytimePresence in PRESENCE_JA)) return NextResponse.json({ error: "暮らし方の条件がありません" }, { status: 400 });
   if (!Array.isArray(messages) || messages.length > 20) return NextResponse.json({ error: "会話が長すぎます。条件を選び直してください" }, { status: 400 });
   const limited = takeAiQuota(req);
   if (limited) return NextResponse.json({ error: limited }, { status: 429 });
 
   const calc = (p: HouseholdProfile) =>
-    calculateEconomics({ kw: diagnosis.now.kw, kwhNow: diagnosis.now.kwh, kwhFuture: diagnosis.future.kwh, profile: p });
+    calculateEconomics({ kw: house.kw, kwhNow: house.kwhNow, kwhFuture: house.kwhFuture, profile: p });
   // 画面の条件での計算は、サーバー側でもう一度行う（画面から送られた数字は使わない）
   const base = calc(profile);
   const household = `
@@ -75,7 +76,7 @@ ${JSON.stringify({ 実際に払う額: base.netCostYen, 設置費用: base.inves
 `;
 
   const result = await runWithTools({
-    system: SYSTEM + diagnosisSummary(diagnosis) + household,
+    system: SYSTEM + house.summary + household,
     messages,
     tools: TOOLS,
     effort: "medium",
