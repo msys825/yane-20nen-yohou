@@ -61,6 +61,19 @@ export default function Home() {
     fetchListing().then((l) => setPairIds(l.filter((h) => h.label).sort((a, b) => a.no - b.no).map((h) => h.gmlId)));
   }, []);
   useEffect(() => asideRef.current?.scrollTo({ top: 0 }), [view, selection]);
+  // 動画・発表用の入口（画面には出さない）：?demo=pair（そっくりな2軒）、?view=ward（区全体）、?example=1（例の家）
+  const urlDone = useRef(false);
+  useEffect(() => {
+    if (urlDone.current) return;
+    const q = new URLSearchParams(window.location.search);
+    if (q.get("demo") === "pair") {
+      if (pairIds.length !== 2) return;
+      openPair();
+    } else if (q.get("view") === "ward") goWard();
+    else if (q.get("example")) openExample();
+    urlDone.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pairIds]);
 
   const goHome = () => {
     setView("home");
@@ -155,6 +168,16 @@ export default function Home() {
                 <input type="checkbox" checked={layers.city} onChange={(e) => setLayers((l) => ({ ...l, city: e.target.checked }))} />
                 <span>20年後に建ちうる建物</span>
               </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setLayersOpen(false);
+                  goWard();
+                }}
+                className="block border-t border-neutral-100 pt-2 text-left text-[#1c6ed0] underline underline-offset-2"
+              >
+                区全体の数字を見る
+              </button>
             </div>
           )}
         </div>
@@ -165,7 +188,7 @@ export default function Home() {
 
       <aside ref={asideRef} className="min-h-0 w-full flex-1 overflow-y-auto border-l border-neutral-200 bg-white text-neutral-900 md:w-[30rem] md:flex-none">
         {view === "home" && (
-          <HomePanel onPick={goPlace} onExample={openExample} onWard={goWard} onPair={pairIds.length === 2 ? openPair : undefined} />
+          <HomePanel onPick={goPlace} onExample={openExample} />
         )}
         {view === "found" && pin && <FoundPanel place={pin} onBack={goHome} />}
         {view === "house" && selection && (
@@ -320,7 +343,7 @@ function LinkButton({ onClick, children }: { onClick: () => void; children: Reac
   );
 }
 
-function HomePanel({ onPick, onExample, onWard, onPair }: { onPick: (p: Place) => void; onExample: () => void; onWard: () => void; onPair?: () => void }) {
+function HomePanel({ onPick, onExample }: { onPick: (p: Place) => void; onExample: () => void }) {
   return (
     <div className="space-y-6 p-5">
       <div>
@@ -329,12 +352,9 @@ function HomePanel({ onPick, onExample, onWard, onPair }: { onPick: (p: Place) =
       </div>
       <p className="text-sm text-neutral-700">南隣に建ちうる建物まで計算して、あなたの屋根の20年を予報します。</p>
       <SearchBox onPick={onPick} />
-      <div className="space-y-2">
-        <p className="text-xs font-bold text-neutral-500">例で試す</p>
-        <LinkButton onClick={onExample}>北町五丁目の家</LinkButton>
-        {onPair && <LinkButton onClick={onPair}>そっくりな2軒、得をするのはどっち？</LinkButton>}
-        <LinkButton onClick={onWard}>練馬区全体</LinkButton>
-      </div>
+      <button type="button" onClick={onExample} className="text-xs text-neutral-500 underline underline-offset-2">
+        住所を入れずに、例の家で試す
+      </button>
     </div>
   );
 }
@@ -602,7 +622,6 @@ function WardPanel(props: {
           <Stat label="増えうる体積" value={`東京ドーム${Math.round(city.addedVolumeM3 / 1240000)}杯`} />
         </div>
       )}
-      {onPair && <LinkButton onClick={onPair}>例：そっくりな2軒</LinkButton>}
       <More>
         <p>気をつけたい家＝南側がルール上の最大まで建て替わると、発電が1割以上減りうる家。</p>
         <p>全戸はPLATEAUの建物データだけの簡易診断。点群で詳しく診断した46軒と比べ、見分けは45軒で一致。</p>
