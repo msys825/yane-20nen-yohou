@@ -128,10 +128,12 @@ export default function Home() {
           pin={pin}
         />
 
-        {/* 地図の左上：住所の検索欄（いつでも使える） */}
-        <div className="absolute left-3 right-32 top-3 md:right-auto md:w-96">
-          <SearchBox compact onPick={goPlace} />
-        </div>
+        {/* 地図の左上：住所の検索欄。入口の画面では右側の欄だけにする（検索欄はいつも1つ） */}
+        {view !== "home" && (
+          <div className="absolute left-3 right-32 top-3 md:right-auto md:w-96">
+            <SearchBox compact onPick={goPlace} />
+          </div>
+        )}
 
         {/* 地図の右上：レイヤー */}
         <div className="absolute right-3 top-3 text-sm text-neutral-900">
