@@ -246,7 +246,7 @@ function Legend({ forecast, city, volumes }: { forecast: boolean; city: boolean;
       {forecast && (
         <>
           <p className="flex items-center gap-2">
-            <span className="inline-block h-3 w-3 rounded-full bg-[#e8590c]" />
+            <span className="inline-block h-3 w-3 rounded-full bg-[#c2255c]" />
             気をつけたい家
           </p>
           <p className="flex items-center gap-2">
@@ -430,7 +430,7 @@ function Stat({ label, value, sub, warn }: { label: string; value: React.ReactNo
   return (
     <div>
       <p className="text-xs text-neutral-500">{label}</p>
-      <p className={`text-xl font-bold ${warn ? "text-orange-700" : ""}`}>{value}</p>
+      <p className={`text-xl font-bold ${warn ? "text-[#c2255c]" : ""}`}>{value}</p>
       {sub && <p className="text-xs text-neutral-500">{sub}</p>}
     </div>
   );
@@ -486,7 +486,7 @@ function HousePanel(props: {
         </p>
 
         {/* 20年予報（結論） */}
-        <section className={`rounded-xl border-2 p-4 ${watch ? "border-orange-300 bg-orange-50" : "border-sky-200 bg-sky-50"}`}>
+        <section className={`rounded-xl border-2 p-4 ${watch ? "border-[#f0a3bd] bg-[#fdf1f5]" : "border-sky-200 bg-sky-50"}`}>
           <p className="text-lg font-bold">{watch ? "将来の影に気をつけたい家" : "将来の影の心配はほとんどない"}</p>
           <div className="mt-2 grid grid-cols-2 gap-3">
             <Stat label="20年後の発電（最悪）" value={`${pct > 0 ? "+" : ""}${pct}%`} warn={watch} />
@@ -599,7 +599,7 @@ function WardPanel(props: {
       <h2 className="text-lg font-bold">練馬区全体の20年予報</h2>
       {forecast ? (
         <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-lg border border-orange-300 bg-orange-50 p-3">
+          <div className="rounded-lg border border-[#f0a3bd] bg-[#fdf1f5] p-3">
             <Stat label="気をつけたい家" value={`${risk.toLocaleString()}軒`} sub={`${((risk / forecast.houses) * 100).toFixed(1)}%`} warn />
           </div>
           <div className="rounded-lg border border-sky-200 bg-sky-50 p-3">
@@ -617,7 +617,7 @@ function WardPanel(props: {
         {cityOn ? "今の街に戻す" : "20年後に建ちうる街を見る"}
       </button>
       {city && cityOn && (
-        <Stat label="高くなりうる建物" value={`${city.count.toLocaleString()}棟`} sub={`区内の${Math.round((city.count / city.candidates) * 100)}%`} />
+        <Stat label="高くなりうる建物" value={<span className="text-[#d9480f]">{`${city.count.toLocaleString()}棟`}</span>} sub={`区内の${Math.round((city.count / city.candidates) * 100)}%`} />
       )}
       <More>
         <p>気をつけたい家＝南側がルール上の最大まで建て替わると、発電が1割以上減りうる家。</p>
@@ -695,7 +695,7 @@ function PairPanel({ pair, stage, onReveal, onBack }: { pair: Diagnosis[]; stage
           </tr>
           {stage === "future" && (
             <>
-              <tr className="border-t border-orange-200 bg-orange-50">
+              <tr className="border-t border-[#f6c5d5] bg-[#fdf1f5]">
                 <td className="py-2 text-neutral-500">南隣の最大</td>
                 {pair.map((d) => (
                   <td key={d.gmlId} className="py-2 font-bold">
@@ -703,10 +703,10 @@ function PairPanel({ pair, stage, onReveal, onBack }: { pair: Diagnosis[]; stage
                   </td>
                 ))}
               </tr>
-              <tr className="border-t border-orange-200 bg-orange-50">
+              <tr className="border-t border-[#f6c5d5] bg-[#fdf1f5]">
                 <td className="py-2 text-neutral-500">20年後の発電</td>
                 {pair.map((d) => (
-                  <td key={d.gmlId} className={`py-2 text-lg font-bold ${d.future.change <= -0.1 ? "text-orange-700" : ""}`}>
+                  <td key={d.gmlId} className={`py-2 text-lg font-bold ${d.future.change <= -0.1 ? "text-[#c2255c]" : ""}`}>
                     {perKw(d.future.kwh, d.now.kw).toLocaleString()} kWh
                     <span className="ml-1 text-sm">
                       （{d.future.change > 0 ? "+" : ""}

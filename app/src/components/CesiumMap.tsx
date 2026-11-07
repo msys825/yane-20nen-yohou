@@ -409,7 +409,7 @@ export default function CesiumMap(props: Props) {
           });
       };
       add(m.safe, "#9ec5e8", 2);
-      add(m.risk, "#e8590c", 5); // 少ないので後から描いて上に重ねる
+      add(m.risk, "#c2255c", 5); // 少ないので後から描いて上に重ねる
       points.show = visible;
       viewer.scene.primitives.add(points);
       forecastPoints.current = points;
