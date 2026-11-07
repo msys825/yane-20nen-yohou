@@ -117,7 +117,7 @@ export default function Home() {
 
   return (
     <main className="flex h-dvh flex-col md:flex-row">
-      <div className="relative h-[52vh] shrink-0 md:h-auto md:flex-1">
+      <div className="relative h-[60dvh] shrink-0 md:h-auto md:flex-1">
         <CesiumMap
           onSelect={(s) => {
             setSelection(s);
@@ -245,7 +245,7 @@ function LayersIcon() {
 function Legend({ forecast, city, volumes }: { forecast: boolean; city: boolean; volumes: boolean }) {
   if (!forecast && !city && !volumes) return null;
   return (
-    <div className="absolute bottom-3 left-3 space-y-1 rounded-lg bg-white/95 px-3 py-2 text-xs text-neutral-800 shadow">
+    <div className="absolute bottom-10 left-3 space-y-1 rounded-lg md:bottom-3 bg-white/95 px-3 py-2 text-xs text-neutral-800 shadow">
       {forecast && (
         <>
           <p className="flex items-center gap-2">
@@ -282,6 +282,15 @@ function SearchBox({ onPick, compact }: { onPick: (p: Place) => void; compact?: 
   const [q, setQ] = useState("");
   const [results, setResults] = useState<Place[] | null>(null);
   const [busy, setBusy] = useState(false);
+  // スマートフォンの幅では、地図の上の検索欄が狭いので、例文を短くする
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setNarrow(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
   const submit = async () => {
     if (!q.trim()) return;
     setBusy(true);
@@ -307,7 +316,7 @@ function SearchBox({ onPick, compact }: { onPick: (p: Place) => void; compact?: 
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="練馬区の住所（例：北町五丁目）"
+          placeholder={compact && narrow ? "例：北町五丁目" : "練馬区の住所（例：北町五丁目）"}
           className={`min-w-0 flex-1 px-3 text-neutral-900 outline-none ${compact ? "py-2 text-sm" : "py-3 text-base"}`}
           aria-label="練馬区の住所"
         />
