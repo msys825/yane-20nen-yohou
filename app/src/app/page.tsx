@@ -60,7 +60,10 @@ export default function Home() {
   useEffect(() => {
     fetchListing().then((l) => setPairIds(l.filter((h) => h.label).sort((a, b) => a.no - b.no).map((h) => h.gmlId)));
   }, []);
-  useEffect(() => asideRef.current?.scrollTo({ top: 0 }), [view, selection]);
+  useEffect(() => {
+    // 新しいブラウザでは scrollTo が Promise を返すので、片付けの関数として返さないように波かっこで囲む
+    asideRef.current?.scrollTo({ top: 0 });
+  }, [view, selection]);
   // 動画・発表用の入口（画面には出さない）：?demo=pair（そっくりな2軒）、?view=ward（区全体）、?example=1（例の家）
   const urlDone = useRef(false);
   useEffect(() => {
