@@ -149,7 +149,7 @@ export default function Home() {
         )}
 
         {/* 地図の右上：レイヤー */}
-        <div className="absolute right-3 top-3 text-sm text-neutral-900">
+        <div className="absolute right-3 top-3 text-sm text-[#1e2733]">
           <button
             type="button"
             onClick={() => setLayersOpen((o) => !o)}
@@ -174,7 +174,7 @@ export default function Home() {
                   setLayersOpen(false);
                   goWard();
                 }}
-                className="block border-t border-neutral-100 pt-2 text-left text-[#1c6ed0] underline underline-offset-2"
+                className="block border-t border-neutral-100 pt-2 text-left text-[#1e2733] underline underline-offset-2"
               >
                 区全体の数字を見る
               </button>
@@ -186,7 +186,7 @@ export default function Home() {
         <Legend forecast={layers.forecast && !layers.city} city={layers.city} volumes={futureVisible && (view === "house" || view === "pair")} />
       </div>
 
-      <aside ref={asideRef} className="min-h-0 w-full flex-1 overflow-y-auto border-l border-neutral-200 bg-white text-neutral-900 md:w-[30rem] md:flex-none">
+      <aside ref={asideRef} className="min-h-0 w-full flex-1 overflow-y-auto border-l border-neutral-200 bg-white text-[#1e2733] md:w-[30rem] md:flex-none">
         {view === "home" && (
           <HomePanel onPick={goPlace} onExample={openExample} />
         )}
@@ -246,11 +246,11 @@ function Legend({ forecast, city, volumes }: { forecast: boolean; city: boolean;
       {forecast && (
         <>
           <p className="flex items-center gap-2">
-            <span className="inline-block h-3 w-3 rounded-full bg-[#c2255c]" />
+            <span className="inline-block h-3 w-3 rounded-full bg-[#1e2733]" />
             気をつけたい家
           </p>
           <p className="flex items-center gap-2">
-            <span className="inline-block h-3 w-3 rounded-full bg-[#9ec5e8]" />
+            <span className="inline-block h-3 w-3 rounded-full bg-[#b7c0ca]" />
             心配なし
           </p>
         </>
@@ -305,15 +305,15 @@ function SearchBox({ onPick, compact }: { onPick: (p: Place) => void; compact?: 
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="練馬区の住所（例：北町五丁目）"
-          className={`min-w-0 flex-1 px-3 text-neutral-900 outline-none ${compact ? "py-2 text-sm" : "py-3 text-base"}`}
+          className={`min-w-0 flex-1 px-3 text-[#1e2733] outline-none ${compact ? "py-2 text-sm" : "py-3 text-base"}`}
           aria-label="練馬区の住所"
         />
-        <button type="submit" disabled={busy} className="bg-neutral-900 px-4 text-sm font-bold text-white disabled:opacity-50">
+        <button type="submit" disabled={busy} className="bg-[#1e2733] px-4 text-sm font-bold text-white disabled:opacity-50">
           {busy ? "…" : "探す"}
         </button>
       </form>
       {results && (
-        <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-lg border border-neutral-200 bg-white text-sm text-neutral-900 shadow-lg">
+        <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-lg border border-neutral-200 bg-white text-sm text-[#1e2733] shadow-lg">
           {results.length === 0 && <li className="px-3 py-2 text-neutral-500">見つかりませんでした</li>}
           {results.map((r) => (
             <li key={`${r.title}${r.lon}`}>
@@ -337,7 +337,7 @@ function SearchBox({ onPick, compact }: { onPick: (p: Place) => void; compact?: 
 
 function LinkButton({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
   return (
-    <button type="button" onClick={onClick} className="block text-left text-sm text-[#1c6ed0] underline underline-offset-2">
+    <button type="button" onClick={onClick} className="block text-left text-sm text-[#1e2733] underline underline-offset-2">
       {children}
     </button>
   );
@@ -364,14 +364,14 @@ function FoundPanel({ place, onBack }: { place: Place; onBack: () => void }) {
     <div className="space-y-4 p-5">
       <BackLink onBack={onBack} />
       <h2 className="text-lg font-bold">{place.title}</h2>
-      <p className="rounded-lg bg-sky-50 p-4 text-sm text-neutral-800">青い目印の近くの、<b>あなたの家をクリック</b></p>
+      <p className="rounded-lg bg-[#f6f3ec] p-4 text-sm text-neutral-800">青い目印の近くの、<b>あなたの家をクリック</b></p>
     </div>
   );
 }
 
 function BackLink({ onBack }: { onBack: () => void }) {
   return (
-    <button type="button" onClick={onBack} className="text-sm text-neutral-500 hover:text-neutral-900">
+    <button type="button" onClick={onBack} className="text-sm text-neutral-500 hover:text-[#1e2733]">
       ← 戻る
     </button>
   );
@@ -430,7 +430,7 @@ function Stat({ label, value, sub, warn }: { label: string; value: React.ReactNo
   return (
     <div>
       <p className="text-xs text-neutral-500">{label}</p>
-      <p className={`text-xl font-bold ${warn ? "text-[#c2255c]" : ""}`}>{value}</p>
+      <p className={`text-xl font-bold ${warn ? "text-[#1e2733]" : ""}`}>{value}</p>
       {sub && <p className="text-xs text-neutral-500">{sub}</p>}
     </div>
   );
@@ -480,13 +480,13 @@ function HousePanel(props: {
         <BackLink onBack={onBack} />
         <p className="text-base font-bold">
           {h.address.replace("東京都", "")}
-          <span className={`ml-2 rounded px-1.5 py-0.5 align-middle text-xs font-bold ${h.kind === "detailed" ? "bg-sky-100 text-sky-800" : "bg-neutral-100 text-neutral-600"}`}>
+          <span className={`ml-2 rounded px-1.5 py-0.5 align-middle text-xs font-bold ${h.kind === "detailed" ? "bg-[#ece7dc] text-[#1e2733]" : "bg-neutral-100 text-neutral-600"}`}>
             {h.kind === "detailed" ? "詳しい診断" : "簡易診断"}
           </span>
         </p>
 
         {/* 20年予報（結論） */}
-        <section className={`rounded-xl border-2 p-4 ${watch ? "border-[#f0a3bd] bg-[#fdf1f5]" : "border-sky-200 bg-sky-50"}`}>
+        <section className={`rounded-xl border-2 p-4 ${watch ? "border-[#1e2733] bg-[#f6f3ec]" : "border-[#e2dccf] bg-[#f6f3ec]"}`}>
           <p className="text-lg font-bold">{watch ? "将来の影に気をつけたい家" : "将来の影の心配はほとんどない"}</p>
           <div className="mt-2 grid grid-cols-2 gap-3">
             <Stat label="20年後の発電（最悪）" value={`${pct > 0 ? "+" : ""}${pct}%`} warn={watch} />
@@ -599,10 +599,10 @@ function WardPanel(props: {
       <h2 className="text-lg font-bold">練馬区全体の20年予報</h2>
       {forecast ? (
         <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-lg border border-[#f0a3bd] bg-[#fdf1f5] p-3">
+          <div className="rounded-lg border border-[#1e2733] bg-[#f6f3ec] p-3">
             <Stat label="気をつけたい家" value={`${risk.toLocaleString()}軒`} sub={`${((risk / forecast.houses) * 100).toFixed(1)}%`} warn />
           </div>
-          <div className="rounded-lg border border-sky-200 bg-sky-50 p-3">
+          <div className="rounded-lg border border-[#e2dccf] bg-[#f6f3ec] p-3">
             <Stat label="心配なし" value={`${(forecast.houses - risk).toLocaleString()}軒`} sub={`戸建て ${forecast.houses.toLocaleString()}軒`} />
           </div>
         </div>
@@ -654,7 +654,7 @@ function PairPanel({ pair, stage, onReveal, onBack }: { pair: Diagnosis[]; stage
           <tr className="text-neutral-500">
             <th className="py-1"></th>
             {pair.map((d) => (
-              <th key={d.gmlId} className="py-1 text-base text-neutral-900">
+              <th key={d.gmlId} className="py-1 text-base text-[#1e2733]">
                 {d.label}
               </th>
             ))}
@@ -695,7 +695,7 @@ function PairPanel({ pair, stage, onReveal, onBack }: { pair: Diagnosis[]; stage
           </tr>
           {stage === "future" && (
             <>
-              <tr className="border-t border-[#f6c5d5] bg-[#fdf1f5]">
+              <tr className="border-t border-[#e2dccf] bg-[#f6f3ec]">
                 <td className="py-2 text-neutral-500">南隣の最大</td>
                 {pair.map((d) => (
                   <td key={d.gmlId} className="py-2 font-bold">
@@ -703,10 +703,10 @@ function PairPanel({ pair, stage, onReveal, onBack }: { pair: Diagnosis[]; stage
                   </td>
                 ))}
               </tr>
-              <tr className="border-t border-[#f6c5d5] bg-[#fdf1f5]">
+              <tr className="border-t border-[#e2dccf] bg-[#f6f3ec]">
                 <td className="py-2 text-neutral-500">20年後の発電</td>
                 {pair.map((d) => (
-                  <td key={d.gmlId} className={`py-2 text-lg font-bold ${d.future.change <= -0.1 ? "text-[#c2255c]" : ""}`}>
+                  <td key={d.gmlId} className={`py-2 text-lg font-bold ${d.future.change <= -0.1 ? "text-[#1e2733]" : ""}`}>
                     {perKw(d.future.kwh, d.now.kw).toLocaleString()} kWh
                     <span className="ml-1 text-sm">
                       （{d.future.change > 0 ? "+" : ""}

@@ -73,7 +73,7 @@ export default function AdvisorChat({ gmlId, kw, kwhNow, kwhFuture, context }: P
   }
 
   const chip = (on: boolean) =>
-    `rounded-full border px-3 py-1 text-sm ${on ? "border-neutral-900 bg-neutral-900 text-white" : "border-neutral-300 bg-white text-neutral-800"}`;
+    `rounded-full border px-3 py-1 text-sm ${on ? "border-[#1e2733] bg-[#1e2733] text-white" : "border-neutral-300 bg-white text-neutral-800"}`;
 
   return (
     <div>
@@ -137,7 +137,7 @@ export default function AdvisorChat({ gmlId, kw, kwhNow, kwhFuture, context }: P
             type="button"
             disabled={busy}
             onClick={() => ask("この結果を、わが家の場合として、やさしく説明してください。", "この結果を説明して")}
-            className="mt-2 w-full rounded-lg bg-neutral-900 px-3 py-2 text-sm font-bold text-white disabled:opacity-40"
+            className="mt-2 w-full rounded-lg bg-[#1e2733] px-3 py-2 text-sm font-bold text-white disabled:opacity-40"
           >
             AIに説明してもらう
           </button>
@@ -146,13 +146,13 @@ export default function AdvisorChat({ gmlId, kw, kwhNow, kwhFuture, context }: P
           {shown.map((m, i) => (
             <div
               key={i}
-              className={m.role === "user" ? "ml-8 rounded-lg bg-blue-50 p-3 text-sm" : "mr-2 rounded-lg bg-neutral-50 p-3"}
+              className={m.role === "user" ? "ml-8 rounded-lg bg-[#f6f3ec] p-3 text-sm" : "mr-2 rounded-lg bg-neutral-50 p-3"}
             >
               {m.role === "user" ? m.text : <Markdown text={m.text} />}
             </div>
           ))}
           {busy && <p className="text-sm text-neutral-500">考えています…</p>}
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-[#c92a2a]">{error}</p>}
         </div>
         {shown.length > 0 && (
           <>
@@ -181,7 +181,7 @@ export default function AdvisorChat({ gmlId, kw, kwhNow, kwhFuture, context }: P
                 className="min-w-0 flex-1 rounded border border-neutral-300 px-2 py-1.5 text-sm"
                 disabled={busy}
               />
-              <button type="submit" disabled={busy} className="rounded bg-neutral-900 px-3 py-1.5 text-sm text-white disabled:opacity-40">
+              <button type="submit" disabled={busy} className="rounded bg-[#1e2733] px-3 py-1.5 text-sm text-white disabled:opacity-40">
                 聞く
               </button>
             </form>
@@ -202,7 +202,7 @@ function EconomicsCard({ e }: { e: EconomicsResult }) {
     ["南に建ったら", e.worst],
   ] as const;
   return (
-    <div className="mt-3 rounded-lg bg-amber-50 p-3 text-sm">
+    <div className="mt-3 rounded-lg bg-[#f6f3ec] p-3 text-sm">
       <table className="w-full text-left">
         <tbody>
           <tr>
@@ -212,10 +212,10 @@ function EconomicsCard({ e }: { e: EconomicsResult }) {
             </td>
           </tr>
           {rows.map(([label, s]) => (
-            <tr key={label} className="border-t border-amber-200">
+            <tr key={label} className="border-t border-[#e2dccf]">
               <td className="py-1 text-neutral-600">{label}</td>
               <td className="py-1 text-right text-neutral-600">{s.paybackYears ? `${s.paybackYears}年で回収` : "回収できない"}</td>
-              <td className={`py-1 pl-3 text-right whitespace-nowrap font-bold ${s.net20Yen >= 0 ? "text-emerald-700" : "text-red-700"}`}>
+              <td className={`py-1 pl-3 text-right whitespace-nowrap font-bold ${s.net20Yen >= 0 ? "text-[#1e2733]" : "text-[#1e2733]"}`}>
                 {s.net20Yen >= 0 ? "+" : "−"}
                 {yen(Math.abs(s.net20Yen))}
               </td>
