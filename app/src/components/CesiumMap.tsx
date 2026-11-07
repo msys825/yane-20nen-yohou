@@ -98,9 +98,6 @@ export default function CesiumMap(props: Props) {
           credit: new Cesium.Credit("出典：国土地理院（地理院タイル）"),
         }),
       );
-      // 背景地図は色を抜いて、データ（建ちうる建物・家の点）を目立たせる
-      baseLayer.saturation = 0.1;
-      baseLayer.brightness = 1.06;
       const viewer = new Cesium.Viewer(containerRef.current, {
         baseLayer,
         baseLayerPicker: false,
@@ -140,7 +137,7 @@ export default function CesiumMap(props: Props) {
             show: false,
             position: Cesium.Cartesian3.fromDegrees(h.lon, h.lat, h.topHeight),
             properties: { gmlId: h.gmlId },
-            point: { pixelSize: 9, color: Cesium.Color.fromCssColorString("#1e2733"), outlineColor: Cesium.Color.WHITE, outlineWidth: 2, disableDepthTestDistance: Number.POSITIVE_INFINITY },
+            point: { pixelSize: 9, color: Cesium.Color.fromCssColorString("#1c7ed6"), outlineColor: Cesium.Color.WHITE, outlineWidth: 2, disableDepthTestDistance: Number.POSITIVE_INFINITY },
             label: {
               text: h.label!,
               font: "bold 15px sans-serif",
@@ -208,7 +205,7 @@ export default function CesiumMap(props: Props) {
         selectedFeature.current = undefined;
         if (picked instanceof Cesium.Cesium3DTileFeature) {
           selectedFeature.current = picked;
-          picked.color = Cesium.Color.fromCssColorString("#5b6573"); // 選んだ家は濃いグレー（オレンジは将来の建物だけに使う）
+          picked.color = Cesium.Color.fromCssColorString("#74b0ea"); // 選んだ家は青（オレンジは将来の建物だけに使う）
           const p: Record<string, unknown> = {};
           for (const id of picked.getPropertyIds()) p[id] = picked.getProperty(id);
           await selectHouse(String(p["gml_id"]), toBuildingInfo(p));
@@ -248,7 +245,7 @@ export default function CesiumMap(props: Props) {
           polyline: {
             positions: Cesium.Cartesian3.fromDegreesArrayHeights([...d.footprint, d.footprint[0]].flatMap(([lon, lat]) => [lon, lat, top])),
             width: 4,
-            material: Cesium.Color.fromCssColorString("#1e2733"),
+            material: Cesium.Color.fromCssColorString("#1c7ed6"),
           },
         }),
       );
@@ -343,7 +340,7 @@ export default function CesiumMap(props: Props) {
     if (!pin) return;
     pinEntity.current = viewer.entities.add({
       position: Cesium.Cartesian3.fromDegrees(pin.lon, pin.lat, 60),
-      point: { pixelSize: 14, color: Cesium.Color.fromCssColorString("#1e2733"), outlineColor: Cesium.Color.WHITE, outlineWidth: 3, disableDepthTestDistance: Number.POSITIVE_INFINITY },
+      point: { pixelSize: 14, color: Cesium.Color.fromCssColorString("#1c7ed6"), outlineColor: Cesium.Color.WHITE, outlineWidth: 3, disableDepthTestDistance: Number.POSITIVE_INFINITY },
       label: {
         text: "探した場所",
         font: "bold 14px sans-serif",
@@ -411,8 +408,8 @@ export default function CesiumMap(props: Props) {
             disableDepthTestDistance: 0,
           });
       };
-      add(m.safe, "#b7c0ca", 2);
-      add(m.risk, "#1e2733", 5); // 少ないので後から描いて上に重ねる
+      add(m.safe, "#9ec5e8", 2);
+      add(m.risk, "#e8590c", 5); // 少ないので後から描いて上に重ねる
       points.show = visible;
       viewer.scene.primitives.add(points);
       forecastPoints.current = points;

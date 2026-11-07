@@ -53,7 +53,7 @@ export default function QuoteCheck({ gmlId, context }: Props) {
       <p className="text-sm text-neutral-600">AIが見積書を読み、この家の屋根と比べます</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {!PUBLIC_DEMO && (
-        <label className="cursor-pointer rounded bg-[#1e2733] px-3 py-1.5 text-sm text-white">
+        <label className="cursor-pointer rounded bg-neutral-900 px-3 py-1.5 text-sm text-white">
           見積書を選ぶ
           <input
             type="file"
@@ -81,7 +81,7 @@ export default function QuoteCheck({ gmlId, context }: Props) {
         <p className="mt-2 text-xs text-neutral-500">公開版はサンプルのみ（個人情報を守るため）</p>
       )}
       {busy && <p className="mt-3 text-sm text-neutral-500">見積書を読んでいます…</p>}
-      {error && <p className="mt-3 text-sm text-[#c92a2a]">{error}</p>}
+      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
       {reply && (
         <div className="mt-3 rounded-lg bg-neutral-50 p-3">
           <Markdown text={reply} />
