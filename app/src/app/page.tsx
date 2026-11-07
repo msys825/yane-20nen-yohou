@@ -246,7 +246,7 @@ function Legend({ forecast, city, volumes }: { forecast: boolean; city: boolean;
       {forecast && (
         <>
           <p className="flex items-center gap-2">
-            <span className="inline-block h-3 w-3 rounded-full bg-[#e8590c]" />
+            <span className="inline-block h-3 w-3 rounded-full border-2 border-[#e8590c]/70 bg-white/40" />
             気をつけたい家
           </p>
           <p className="flex items-center gap-2">
@@ -426,7 +426,7 @@ function toModel(s: Selection, simple: SimpleDiagnosis | null): HouseModel | nul
   };
 }
 
-function Stat({ label, value, sub, warn }: { label: string; value: React.ReactNode; sub?: React.ReactNode; warn?: boolean }) {
+function Stat({ label, value, sub, warn }: { label: React.ReactNode; value: React.ReactNode; sub?: React.ReactNode; warn?: boolean }) {
   return (
     <div>
       <p className="text-xs text-neutral-500">{label}</p>
@@ -597,30 +597,36 @@ function WardPanel(props: {
     <div className="space-y-5 p-5 text-sm">
       <BackLink onBack={onBack} />
       <h2 className="text-lg font-bold">練馬区全体の20年予報</h2>
-      {forecast ? (
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-lg border border-orange-300 bg-orange-50 p-3">
-            <Stat label="気をつけたい家" value={`${risk.toLocaleString()}軒`} sub={`${((risk / forecast.houses) * 100).toFixed(1)}%`} warn />
+      {/* 右の数字は、いま地図に出ているものだけ（家の予報と、建ちうる街を同じ画面に並べない） */}
+      {!cityOn &&
+        (forecast ? (
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-lg border border-orange-300 bg-orange-50 p-3">
+              <Stat label={<><span className="mr-1 inline-block h-2.5 w-2.5 rounded-full border-2 border-[#e8590c]/70 bg-white/40 align-[-1px]" />気をつけたい家</>} value={`${risk.toLocaleString()}軒`} sub={`${((risk / forecast.houses) * 100).toFixed(1)}%`} warn />
+            </div>
+            <div className="rounded-lg border border-sky-200 bg-sky-50 p-3">
+              <Stat label="心配なし" value={`${(forecast.houses - risk).toLocaleString()}軒`} sub={`戸建て ${forecast.houses.toLocaleString()}軒`} />
+            </div>
           </div>
-          <div className="rounded-lg border border-sky-200 bg-sky-50 p-3">
-            <Stat label="心配なし" value={`${(forecast.houses - risk).toLocaleString()}軒`} sub={`戸建て ${forecast.houses.toLocaleString()}軒`} />
-          </div>
+        ) : (
+          <p className="text-neutral-500">読み込んでいます…</p>
+        ))}
+      {cityOn && (
+        <div className="rounded-lg border border-neutral-200 p-3">
+          {city ? (
+            <Stat label={<><span className="mr-1 inline-block h-2.5 w-2.5 rounded-sm border-2 border-[#e8590c] bg-[#e8590c]/45 align-[-1px]" />今より高くなりうる建物</>} value={`${city.count.toLocaleString()}棟`} sub={`区内の建物の${Math.round((city.count / city.candidates) * 100)}%`} />
+          ) : (
+            <p className="text-neutral-500">読み込んでいます…</p>
+          )}
         </div>
-      ) : (
-        <p className="text-neutral-500">読み込んでいます…</p>
       )}
       <button
         type="button"
         onClick={() => onCity(!cityOn)}
         className={`w-full rounded-lg px-3 py-2 font-bold ${cityOn ? "border border-neutral-300 text-neutral-800" : "bg-[#e8590c] text-white"}`}
       >
-        {cityOn ? "今の街に戻す" : "20年後に建ちうる街を見る"}
+        {cityOn ? "家の予報に戻す" : "20年後に建ちうる街を見る"}
       </button>
-      {city && cityOn && (
-        <div className="rounded-lg border border-orange-300 bg-orange-50 p-3">
-          <Stat label="高くなりうる建物" value={`${city.count.toLocaleString()}棟`} sub={`区内の${Math.round((city.count / city.candidates) * 100)}%`} warn />
-        </div>
-      )}
       <More>
         <p>気をつけたい家＝南側がルール上の最大まで建て替わると、発電が1割以上減りうる家。</p>
         <p>全戸はPLATEAUの建物データだけの簡易診断。点群で詳しく診断した46軒と比べ、見分けは45軒で一致。</p>

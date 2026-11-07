@@ -396,20 +396,24 @@ export default function CesiumMap(props: Props) {
       if (cancelled || forecastPoints.current) return;
       const points = new Cesium.PointPrimitiveCollection();
       // 屋根の少し上に、家ごとの点を置く
-      const add = (arr: number[], color: string, size: number) => {
-        const c = Cesium.Color.fromCssColorString(color);
+      // ring=true のときは白抜きの輪（気をつけたい家）。オレンジの塊＝建ちうる建物と、形で見分ける
+      const add = (arr: number[], color: string, size: number, ring = false) => {
+        // 輪は少し透かして、地図になじませる
+        const c = ring ? Cesium.Color.WHITE.withAlpha(0.35) : Cesium.Color.fromCssColorString(color);
+        const oc = Cesium.Color.fromCssColorString(color).withAlpha(0.7);
         for (let i = 0; i < arr.length; i += 3)
           points.add({
             position: Cesium.Cartesian3.fromDegrees(arr[i], arr[i + 1], arr[i + 2] + 1.5),
             color: c,
             pixelSize: size,
+            ...(ring ? { outlineColor: oc, outlineWidth: 1.8 } : {}),
             scaleByDistance: new Cesium.NearFarScalar(300, 1.6, 8000, 1),
             // 建物に隠れる点は見せない（近くで、点が建物の手前に浮いて見えないように）
             disableDepthTestDistance: 0,
           });
       };
       add(m.safe, "#9ec5e8", 2);
-      add(m.risk, "#e8590c", 5); // 少ないので後から描いて上に重ねる
+      add(m.risk, "#e8590c", 6, true); // 少ないので後から描いて上に重ねる
       points.show = visible;
       viewer.scene.primitives.add(points);
       forecastPoints.current = points;
