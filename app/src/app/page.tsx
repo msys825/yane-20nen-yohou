@@ -599,9 +599,8 @@ function WardPanel(props: {
       <h2 className="text-lg font-bold">練馬区全体の20年予報</h2>
       {forecast ? (
         <div className="grid grid-cols-2 gap-3">
-          {/* オレンジは「今、地図にオレンジで出ているもの」の数字にだけ使う（建ちうる街を見ている間は、建物の棟数の方） */}
-          <div className={`rounded-lg border p-3 ${cityOn ? "border-neutral-200 bg-white" : "border-orange-300 bg-orange-50"}`}>
-            <Stat label="気をつけたい家" value={`${risk.toLocaleString()}軒`} sub={`${((risk / forecast.houses) * 100).toFixed(1)}%`} warn={!cityOn} />
+          <div className="rounded-lg border border-orange-300 bg-orange-50 p-3">
+            <Stat label="気をつけたい家" value={`${risk.toLocaleString()}軒`} sub={`${((risk / forecast.houses) * 100).toFixed(1)}%`} warn />
           </div>
           <div className="rounded-lg border border-sky-200 bg-sky-50 p-3">
             <Stat label="心配なし" value={`${(forecast.houses - risk).toLocaleString()}軒`} sub={`戸建て ${forecast.houses.toLocaleString()}軒`} />
