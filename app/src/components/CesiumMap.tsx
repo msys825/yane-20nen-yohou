@@ -157,11 +157,10 @@ export default function CesiumMap(props: Props) {
         let volumes: NearVolume[];
         let lon = info?.lon;
         let lat = info?.lat;
-        let base = 40;
+        let near0Base: number | undefined; // 南隣の建物の底の高さ（屋根の高さが読めないときの目安）
         if (diagnosis) {
           lon = diagnosis.lon;
           lat = diagnosis.lat;
-          base = diagnosis.baseHeight;
           volumes = diagnosis.volumes.map((v) => ({ bearing: v.bearing, distance: v.distance, nowHeight: v.nowHeight, maxHeight: v.maxHeight, reason: v.reason }));
           drawFuture([diagnosis]);
         } else if (lon && lat) {
@@ -177,19 +176,33 @@ export default function CesiumMap(props: Props) {
             })
             .filter((v) => v.d > 2 && v.d < 30 && v.bearing >= 100 && v.bearing <= 260)
             .sort((a, b) => a.d - b.d);
-          base = near[0]?.b.b ?? 40;
+          near0Base = near[0]?.b.b;
           drawFuture([]);
           drawVolumes(near.map(({ b }) => ({ footprint: b.f, baseHeight: b.b, nowHeight: b.h, maxHeight: b.m })));
           volumes = near.map(({ b, d, bearing }) => ({ bearing: Math.round(bearing), distance: Math.round(d * 10) / 10, nowHeight: b.h, maxHeight: b.m }));
         } else {
           volumes = [];
         }
-        if (lon && lat)
+        if (lon && lat) {
+          // 家の屋根が画面の真ん中に来るように、南の斜め上にカメラを置く
+          // 屋根の高さ：詳しい診断があればその値、なければ地図の建物から読む（読めないときは、近くの建物の底 + 6m）
+          let roof = diagnosis ? diagnosis.baseHeight + (diagnosis.height ?? 6) : undefined;
+          if (roof === undefined) {
+            try {
+              roof = viewer.scene.sampleHeight(Cesium.Cartographic.fromDegrees(lon, lat));
+            } catch {
+              roof = undefined;
+            }
+          }
+          if (roof === undefined || !Number.isFinite(roof)) roof = (near0Base ?? 75) + 6;
+          const back = 110;
+          const pitch = 38;
           viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(lon, lat - 0.0011, base + 70),
-            orientation: { heading: 0, pitch: Cesium.Math.toRadians(-38), roll: 0 },
+            destination: Cesium.Cartesian3.fromDegrees(lon, lat - back / 110950, roof + back * Math.tan((pitch * Math.PI) / 180)),
+            orientation: { heading: 0, pitch: Cesium.Math.toRadians(-pitch), roll: 0 },
             duration: 1.2,
           });
+        }
         cb.current.onSelect?.({ info, diagnosis, volumes });
       };
       selectHouseRef.current = selectHouse;
