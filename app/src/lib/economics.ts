@@ -31,6 +31,7 @@ export const ASSUMPTION_SOURCES = [
   "パワーコンディショナ：20年間で一度交換、38.4万円程度（同意見、5kW想定）から、東京都の更新助成（2分の1・上限10万円）を引いた28.4万円を15年目に計上。交換する年は仮定",
   "定期点検：3〜5年ごとに1回、約3.8万円（同意見）。「南に建ったら」だけ4年ごとに計上",
   "パネルの劣化 年0.5%は仮定",
+  "家で使える割合：月の電気代1万2千円で25〜45%（昼に人がいるほど高い）。電気代に比例して増減し、上限は70%。どちらも目安で、仮定",
 ];
 
 export type DaytimePresence = "rarely" | "sometimes" | "mostly";
@@ -39,7 +40,6 @@ export type HouseholdProfile = {
   monthlyBillYen: number; // 月の電気代（平均）
   daytimePresence: DaytimePresence; // 平日の昼に家に人がいるか
   evPlan: boolean; // 電気自動車を家で充電する予定
-  householdSize: number;
 };
 
 export type EconomicsInput = {
@@ -79,10 +79,14 @@ export function annualUseFromBill(monthlyBillYen: number): number {
   return Math.round((monthlyBillYen * 12) / ASSUMPTIONS.buyPriceYen.mid);
 }
 
-// 発電した電気のうち、家で使える割合（昼に人がいるほど高い。目安）
+// 割合の目安を置いたときの、月の電気代（この額のとき、下の割合そのままになる）
+const STANDARD_BILL_YEN = 12_000;
+
+// 発電した電気のうち、家で使える割合（昼に人がいるほど、電気を多く使うほど高い。目安）
 export function selfUseRatio(p: HouseholdProfile): number {
   const base = { rarely: 0.25, sometimes: 0.35, mostly: 0.45 }[p.daytimePresence];
-  return Math.min(0.7, base + (p.evPlan ? 0.1 : 0));
+  const byUse = p.monthlyBillYen / STANDARD_BILL_YEN; // 電気を多く使う家ほど、昼に使う分も多い（電気代に比例、仮定）
+  return Math.min(0.7, (base + (p.evPlan ? 0.1 : 0)) * byUse);
 }
 
 function sellPrice(year: number): number {

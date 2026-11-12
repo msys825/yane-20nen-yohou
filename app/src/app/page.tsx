@@ -53,6 +53,8 @@ export default function Home() {
   const [pin, setPin] = useState<Place | null>(null);
   const [selectGml, setSelectGml] = useState<{ gmlId: string; requestedAt: number } | null>(null);
   const [showFuture, setShowFuture] = useState(true);
+  // 暮らし方。家を変えても残す。いちばん上の「20年の損得」と、下のお金の表を、同じ条件で出す
+  const [profile, setProfile] = useState<HouseholdProfile>(DEFAULT_PROFILE);
   const [hour, setHour] = useState(12);
   const timeIso = useMemo(() => jstToUtcIso(hour), [hour]);
   const [pairIds, setPairIds] = useState<string[]>([]);
@@ -173,9 +175,17 @@ export default function Home() {
                 <input type="checkbox" checked={layers.forecast} onChange={(e) => setLayers((l) => ({ ...l, forecast: e.target.checked }))} />
                 <span>将来の影の予報（家の色）</span>
               </label>
-              <label className="flex gap-2">
-                <input type="checkbox" checked={layers.city} onChange={(e) => setLayers((l) => ({ ...l, city: e.target.checked }))} />
-                <span>20年後に建ちうる建物</span>
+              <label className={`flex gap-2 ${view === "home" ? "text-neutral-400" : ""}`}>
+                <input
+                  type="checkbox"
+                  disabled={view === "home"}
+                  checked={layers.city}
+                  onChange={(e) => setLayers((l) => ({ ...l, city: e.target.checked }))}
+                />
+                <span>
+                  20年後に建ちうる建物
+                  {view === "home" && <span className="block text-xs">家を選ぶと見えます</span>}
+                </span>
               </label>
               <button
                 type="button"
@@ -209,6 +219,8 @@ export default function Home() {
             setHour={setHour}
             showFuture={showFuture}
             setShowFuture={setShowFuture}
+            profile={profile}
+            setProfile={setProfile}
             onBack={goHome}
           />
         )}
@@ -427,7 +439,7 @@ function BackLink({ onBack }: { onBack: () => void }) {
   );
 }
 
-const DEFAULT_PROFILE: HouseholdProfile = { monthlyBillYen: 12000, daytimePresence: "sometimes", evPlan: false, householdSize: 3 };
+const DEFAULT_PROFILE: HouseholdProfile = { monthlyBillYen: 12000, daytimePresence: "sometimes", evPlan: false };
 
 type HouseModel = {
   gmlId: string;
@@ -493,11 +505,11 @@ function HousePanel(props: {
   setHour: (h: number) => void;
   showFuture: boolean;
   setShowFuture: (v: boolean) => void;
+  profile: HouseholdProfile;
+  setProfile: (p: HouseholdProfile) => void;
   onBack: () => void;
 }) {
-  const { s, simple, hour, setHour, showFuture, setShowFuture, onBack } = props;
-  // 暮らし方。いちばん上の「20年の損得」と、下のお金の表を、同じ条件で出す
-  const [profile, setProfile] = useState<HouseholdProfile>(DEFAULT_PROFILE);
+  const { s, simple, hour, setHour, showFuture, setShowFuture, onBack, profile, setProfile } = props;
   const h = toModel(s, simple);
   if (!h) {
     const usage = s.info?.detailedUsage ?? s.info?.usage;
@@ -542,7 +554,7 @@ function HousePanel(props: {
           <p className="text-lg font-bold">{watch ? "将来の影に気をつけたい家" : "将来の影の心配はほとんどない"}</p>
           <div className="mt-2 grid grid-cols-2 gap-3">
             <Stat label="20年後の発電（最悪）" value={`${pct > 0 ? "+" : ""}${pct}%`} warn={watch} />
-            <Stat label="20年の損得" value={`${man(econ.worst.net20Yen)}〜${man(econ.best.net20Yen)}`} />
+            <Stat label="20年の損得" value={<span className="whitespace-nowrap text-[15px] min-[480px]:text-xl">{`${man(econ.worst.net20Yen)}〜${man(econ.best.net20Yen)}`}</span>} />
           </div>
         </section>
       </div>

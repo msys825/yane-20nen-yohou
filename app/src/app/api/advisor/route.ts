@@ -32,7 +32,7 @@ const TOOLS: Anthropic.Beta.BetaTool[] = [
     input_schema: {
       type: "object",
       additionalProperties: false,
-      required: ["monthly_bill_yen", "daytime_presence", "ev_plan", "household_size"],
+      required: ["monthly_bill_yen", "daytime_presence", "ev_plan"],
       properties: {
         monthly_bill_yen: { type: "integer", description: "月の電気代の平均（円）" },
         daytime_presence: {
@@ -41,7 +41,6 @@ const TOOLS: Anthropic.Beta.BetaTool[] = [
           description: "平日の昼に家に人がいるか。rarely=ほとんどいない、sometimes=時々いる、mostly=ほとんどいる",
         },
         ev_plan: { type: "boolean", description: "電気自動車を家で充電する予定があるか" },
-        household_size: { type: "integer", description: "家族の人数" },
       },
     },
   },
@@ -71,7 +70,7 @@ export async function POST(req: Request) {
   const base = calc(profile);
   const household = `
 画面で選んだ暮らし方
-- 月の電気代：${profile.monthlyBillYen}円／平日の昼：${PRESENCE_JA[profile.daytimePresence]}／電気自動車：${profile.evPlan ? "家で充電する予定あり" : "なし"}／家族：${profile.householdSize}人
+- 月の電気代：${profile.monthlyBillYen}円／平日の昼：${PRESENCE_JA[profile.daytimePresence]}／電気自動車：${profile.evPlan ? "家で充電する予定あり" : "なし"}
 
 計算結果（calculate_economics と同じ道具で計算済み）
 ${JSON.stringify({ 実際に払う額: base.netCostYen, 設置費用: base.investmentYen, 東京都の補助: base.subsidyYen, 南が今のまま: base.best, 南に建ったら: base.worst, 前提: base.sources })}
@@ -85,12 +84,11 @@ ${JSON.stringify({ 実際に払う額: base.netCostYen, 設置費用: base.inves
     effort: "medium",
     handlers: {
       calculate_economics: (raw) => {
-        const i = raw as { monthly_bill_yen: number; daytime_presence: HouseholdProfile["daytimePresence"]; ev_plan: boolean; household_size: number };
+        const i = raw as { monthly_bill_yen: number; daytime_presence: HouseholdProfile["daytimePresence"]; ev_plan: boolean };
         return calc({
           monthlyBillYen: i.monthly_bill_yen,
           daytimePresence: i.daytime_presence,
           evPlan: i.ev_plan,
-          householdSize: i.household_size,
         });
       },
     },

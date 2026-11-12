@@ -127,16 +127,6 @@ export default function AdvisorChat({ gmlId, kw, kwhNow, kwhFuture, context, pro
               ))}
             </div>
           </div>
-          <div>
-            <p className="text-neutral-600">家族</p>
-            <div className="mt-1 flex gap-2">
-              {[1, 2, 3, 4, 5].map((n) => (
-                <button key={n} type="button" className={chip(profile.householdSize === n)} onClick={() => update({ householdSize: n })}>
-                  {n === 5 ? "5+" : n}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 
