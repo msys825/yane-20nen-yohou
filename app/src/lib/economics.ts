@@ -120,8 +120,10 @@ function scenario(
     if (withInspection && y % ASSUMPTIONS.inspectionEveryYears === 0) benefit -= ASSUMPTIONS.inspectionYen;
     const before = cumulative;
     cumulative += benefit;
-    if (payback === null && before < 0 && cumulative >= 0) payback = Math.round((y - 1 + -before / benefit) * 10) / 10;
+    // 機械の交換などで、また赤字に戻ることがある。最後に黒字へ変わった年を「回収」とする
+    if (before < 0 && cumulative >= 0) payback = Math.round((y - 1 + -before / benefit) * 10) / 10;
   }
+  if (cumulative < 0) payback = null; // 20年たって赤字なら、回収できていない
   return { label, paybackYears: payback, net20Yen: Math.round(cumulative) };
 }
 

@@ -28,7 +28,8 @@ type Place = { title: string; lon: number; lat: number };
 // 国土地理院の住所検索（登録不要）。練馬区の住所だけを返す
 async function searchAddress(q: string): Promise<Place[]> {
   const query = q.includes("練馬") ? q : `練馬区${q}`;
-  const res = await fetch(`https://msearch.gsi.go.jp/address-search/AddressSearch?q=${encodeURIComponent(query)}`);
+  // 返事が来ないときに待たせ続けないよう、8秒で打ち切る
+  const res = await fetch(`https://msearch.gsi.go.jp/address-search/AddressSearch?q=${encodeURIComponent(query)}`, { signal: AbortSignal.timeout(8000) });
   if (!res.ok) throw new Error("address search failed");
   const items = (await res.json()) as { geometry: { coordinates: [number, number] }; properties: { title: string } }[];
   // 町の名前が分からない入力には、「東京都練馬区」だけが返る。これは「見つからない」として扱う
@@ -370,7 +371,8 @@ function SearchBox({ onPick, compact }: { onPick: (p: Place) => void; compact?: 
         </button>
       </form>
       {failed && (
-        <p className="absolute z-10 mt-1 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-500 shadow-lg">
+        // 入口の画面では、下の「例の家で試す」をかくさないように、重ねずに出す
+        <p className={`mt-1 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-500 ${compact ? "absolute z-10 shadow-lg" : ""}`}>
           今は探せません。少し待って、もう一度お試しください
         </p>
       )}
@@ -517,7 +519,13 @@ function HousePanel(props: {
       <div className="space-y-4 p-5">
         <BackLink onBack={onBack} />
         <p className="text-sm text-neutral-700">
-          {s.info && !simple ? (usage && usage !== "独立住宅" ? "戸建て（独立住宅）だけを予報しています" : "読み込んでいます…") : "戸建ての屋根をクリックしてください"}
+          {s.info && !simple
+            ? usage && usage !== "独立住宅"
+              ? "戸建て（独立住宅）だけを予報しています"
+              : "読み込んでいます…"
+            : s.info && simple
+              ? "この家は屋根が小さく、予報を出せません"
+              : "戸建ての屋根をクリックしてください"}
         </p>
       </div>
     );
