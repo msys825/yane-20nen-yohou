@@ -31,3 +31,14 @@ export function takeAiQuota(req: Request): string | null {
   total += 1;
   return null;
 }
+
+// AI の呼び出しが失敗したときに、数えた1回を戻す
+export function refundAiQuota(req: Request): void {
+  if (!isPublicDemo()) return;
+  const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
+  const used = perIp.get(ip) ?? 0;
+  if (used > 0) perIp.set(ip, used - 1);
+  if (total > 0) total -= 1;
+}
+
+export const AI_UNAVAILABLE = "今はAIが使えません。少し待って、もう一度お試しください。";

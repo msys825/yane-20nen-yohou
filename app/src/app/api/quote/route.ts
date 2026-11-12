@@ -4,7 +4,7 @@ import path from "node:path";
 import { NextResponse } from "next/server";
 import { ASSUMPTIONS } from "@/lib/economics";
 import { runWithTools } from "@/lib/server/claude";
-import { isPublicDemo, takeAiQuota } from "@/lib/server/limits";
+import { AI_UNAVAILABLE, isPublicDemo, refundAiQuota, takeAiQuota } from "@/lib/server/limits";
 import { loadHouseForAi, type HouseContext } from "@/lib/server/houses";
 
 export const runtime = "nodejs";
@@ -50,13 +50,15 @@ type Quote = {
 };
 
 export async function POST(req: Request) {
-  const body = (await req.json()) as { gmlId: string; sample?: boolean; fileBase64?: string; mediaType?: string; context?: HouseContext };
+  const body = (await req.json().catch(() => null)) as { gmlId: string; sample?: boolean; fileBase64?: string; mediaType?: string; context?: HouseContext } | null;
+  if (!body || typeof body.gmlId !== "string") return NextResponse.json({ error: "送られた内容を読めませんでした" }, { status: 400 });
   const house = await loadHouseForAi(body.gmlId, body.context);
   if (!house) return NextResponse.json({ error: "診断データが見つかりません" }, { status: 404 });
   // 公開版では、知らない人の書類（個人情報を含みうる）を受け取らず、サンプルの見積書だけを読む
   if (isPublicDemo() && !body.sample) return NextResponse.json({ error: "公開版では、サンプルの見積書だけを試せます" }, { status: 400 });
   const limited = takeAiQuota(req);
   if (limited) return NextResponse.json({ error: limited }, { status: 429 });
+  try {
   let fileBase64 = body.fileBase64 ?? "";
   let mediaType = body.mediaType ?? "";
   if (body.sample) {
@@ -64,7 +66,10 @@ export async function POST(req: Request) {
     fileBase64 = buf.toString("base64");
     mediaType = "image/png";
   }
-  if (!fileBase64 || fileBase64.length > 7_000_000) return NextResponse.json({ error: "ファイルがないか、大きすぎます（5MBまで）" }, { status: 400 });
+  if (!fileBase64 || fileBase64.length > 7_000_000) {
+    refundAiQuota(req);
+    return NextResponse.json({ error: "ファイルがないか、大きすぎます（5MBまで）" }, { status: 400 });
+  }
 
   const fileBlock: Anthropic.Beta.BetaContentBlockParam =
     mediaType === "application/pdf"
@@ -106,4 +111,10 @@ export async function POST(req: Request) {
   });
 
   return NextResponse.json({ reply: result.text, comparison: result.toolOutputs["record_quote"] ?? null });
+  } catch (e) {
+    // AI が使えないとき（鍵・残高・混雑など）。理由は記録に残し、利用者にはやさしい案内だけを返す
+    console.error("quote: AI の呼び出しに失敗", e);
+    refundAiQuota(req);
+    return NextResponse.json({ error: AI_UNAVAILABLE }, { status: 503 });
+  }
 }

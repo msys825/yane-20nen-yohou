@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { BuildingInfo } from "@/lib/plateau";
 import { azimuthLabel, fetchListing, type Diagnosis } from "@/lib/diagnosis";
-import { calculateEconomics } from "@/lib/economics";
+import { calculateEconomics, type HouseholdProfile } from "@/lib/economics";
 import AdvisorChat, { EconomicsCard, type HouseContext } from "@/components/AdvisorChat";
 import type { CameraRequest, FutureCity, ForecastMap, NearVolume, Selection } from "@/components/CesiumMap";
 import { fetchSimple, type SimpleDiagnosis } from "@/lib/simple";
@@ -29,10 +29,14 @@ type Place = { title: string; lon: number; lat: number };
 async function searchAddress(q: string): Promise<Place[]> {
   const query = q.includes("練馬") ? q : `練馬区${q}`;
   const res = await fetch(`https://msearch.gsi.go.jp/address-search/AddressSearch?q=${encodeURIComponent(query)}`);
-  if (!res.ok) return [];
+  if (!res.ok) throw new Error("address search failed");
   const items = (await res.json()) as { geometry: { coordinates: [number, number] }; properties: { title: string } }[];
+  // 町の名前が分からない入力には、「東京都練馬区」だけが返る。これは「見つからない」として扱う
+  // （「練馬」「練馬区」とだけ入れたときは、区の真ん中へ案内する）
+  const wardOnly = /^(東京都)?練馬区?$/.test(q);
   return items
     .filter((i) => i.properties.title.includes("練馬区"))
+    .filter((i) => wardOnly || i.properties.title !== "東京都練馬区")
     .slice(0, 6)
     .map((i) => ({ title: i.properties.title.replace("東京都", ""), lon: i.geometry.coordinates[0], lat: i.geometry.coordinates[1] }));
 }
@@ -85,6 +89,7 @@ export default function Home() {
     setCompare(null);
     setPair(null);
     setPin(null);
+    setCamera({ kind: "ward", requestedAt: Date.now() }); // 地図も、最初の区全体の眺めに戻す
   };
   const goWard = () => {
     setView("ward");
@@ -135,6 +140,7 @@ export default function Home() {
           }}
           compare={compare}
           selectGml={selectGml}
+          hasSelection={!!selection}
           showFuture={futureVisible}
           timeIso={timeIso}
           layers={layers}
@@ -186,7 +192,7 @@ export default function Home() {
         </div>
 
         {/* 地図の左下：凡例（レイヤーを入れているときだけ） */}
-        <Legend forecast={layers.forecast && !layers.city} city={layers.city} volumes={futureVisible && (view === "house" || view === "pair")} />
+        <Legend forecast={layers.forecast && !layers.city} city={layers.city} volumes={futureVisible && (view === "pair" || (view === "house" && !!selection?.volumes.length))} />
       </div>
 
       <aside ref={asideRef} className="min-h-0 w-full flex-1 overflow-y-auto border-l border-neutral-200 bg-white text-neutral-900 md:w-[30rem] md:flex-none">
@@ -282,6 +288,29 @@ function SearchBox({ onPick, compact }: { onPick: (p: Place) => void; compact?: 
   const [q, setQ] = useState("");
   const [results, setResults] = useState<Place[] | null>(null);
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const open = results !== null || failed;
+  // 候補の一覧は、外をクリックするか Esc キーで閉じる
+  useEffect(() => {
+    if (!open) return;
+    const close = () => {
+      setResults(null);
+      setFailed(false);
+    };
+    const onDown = (e: PointerEvent) => {
+      if (!boxRef.current?.contains(e.target as Node)) close();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
   // スマートフォンの幅では、地図の上の検索欄が狭いので、例文を短くする
   const [narrow, setNarrow] = useState(false);
   useEffect(() => {
@@ -294,18 +323,22 @@ function SearchBox({ onPick, compact }: { onPick: (p: Place) => void; compact?: 
   const submit = async () => {
     if (!q.trim()) return;
     setBusy(true);
+    setFailed(false);
     try {
       const r = await searchAddress(q.trim());
       if (r.length === 1) {
         onPick(r[0]);
         setResults(null);
       } else setResults(r);
+    } catch {
+      setResults(null);
+      setFailed(true);
     } finally {
       setBusy(false);
     }
   };
   return (
-    <div className="relative">
+    <div ref={boxRef} className="relative">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -324,9 +357,14 @@ function SearchBox({ onPick, compact }: { onPick: (p: Place) => void; compact?: 
           {busy ? "…" : "探す"}
         </button>
       </form>
+      {failed && (
+        <p className="absolute z-10 mt-1 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-500 shadow-lg">
+          今は探せません。少し待って、もう一度お試しください
+        </p>
+      )}
       {results && (
         <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-lg border border-neutral-200 bg-white text-sm text-neutral-900 shadow-lg">
-          {results.length === 0 && <li className="px-3 py-2 text-neutral-500">見つかりませんでした</li>}
+          {results.length === 0 && <li className="px-3 py-2 text-neutral-500">見つかりませんでした。練馬区の町の名前で探してください</li>}
           {results.map((r) => (
             <li key={`${r.title}${r.lon}`}>
               <button
@@ -389,7 +427,7 @@ function BackLink({ onBack }: { onBack: () => void }) {
   );
 }
 
-const DEFAULT_PROFILE = { monthlyBillYen: 12000, daytimePresence: "sometimes" as const, evPlan: false, householdSize: 3 };
+const DEFAULT_PROFILE: HouseholdProfile = { monthlyBillYen: 12000, daytimePresence: "sometimes", evPlan: false, householdSize: 3 };
 
 type HouseModel = {
   gmlId: string;
@@ -458,6 +496,8 @@ function HousePanel(props: {
   onBack: () => void;
 }) {
   const { s, simple, hour, setHour, showFuture, setShowFuture, onBack } = props;
+  // 暮らし方。いちばん上の「20年の損得」と、下のお金の表を、同じ条件で出す
+  const [profile, setProfile] = useState<HouseholdProfile>(DEFAULT_PROFILE);
   const h = toModel(s, simple);
   if (!h) {
     const usage = s.info?.detailedUsage ?? s.info?.usage;
@@ -472,7 +512,7 @@ function HousePanel(props: {
   }
   const pct = Math.round(((h.kwhFuture - h.kwhNow) / h.kwhNow) * 100);
   const watch = pct <= -10;
-  const econ = calculateEconomics({ kw: h.kw, kwhNow: h.kwhNow, kwhFuture: h.kwhFuture, profile: DEFAULT_PROFILE });
+  const econ = calculateEconomics({ kw: h.kw, kwhNow: h.kwhNow, kwhFuture: h.kwhFuture, profile });
   const man = (v: number) => `${v >= 0 ? "+" : "−"}${Math.round(Math.abs(v) / 10000)}万円`;
   const context: HouseContext | undefined =
     h.kind === "simple" ? { address: h.address, zone: h.zone ?? undefined, storeys: h.storeys ?? undefined, height: h.height ?? undefined, volumes: s.volumes } : undefined;
@@ -579,7 +619,7 @@ function HousePanel(props: {
 
         <section id="sec-money" className="scroll-mt-14 space-y-3">
           <h2 className="font-bold">お金（20年）</h2>
-          <AdvisorChat key={`advisor-${h.gmlId}`} gmlId={h.gmlId} kw={h.kw} kwhNow={h.kwhNow} kwhFuture={h.kwhFuture} context={context} />
+          <AdvisorChat key={`advisor-${h.gmlId}`} gmlId={h.gmlId} kw={h.kw} kwhNow={h.kwhNow} kwhFuture={h.kwhFuture} context={context} profile={profile} onProfile={setProfile} />
         </section>
 
         <section id="sec-quote" className="scroll-mt-14 space-y-3">

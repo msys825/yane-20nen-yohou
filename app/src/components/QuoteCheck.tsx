@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Markdown from "./Markdown";
+import { AI_UNAVAILABLE, postAi } from "@/lib/aiFetch";
 
 import type { HouseContext } from "./AdvisorChat";
 
@@ -33,16 +34,13 @@ export default function QuoteCheck({ gmlId, context }: Props) {
     setError(null);
     setReply(null);
     try {
-      const res = await fetch("/api/quote", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(blob ? { gmlId, context, mediaType, fileBase64: await toBase64(blob) } : { gmlId, context, sample: true }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "エラーが起きました");
+      const data = await postAi<{ reply: string }>(
+        "/api/quote",
+        blob ? { gmlId, context, mediaType, fileBase64: await toBase64(blob) } : { gmlId, context, sample: true },
+      );
       setReply(data.reply);
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(e instanceof Error && e.message ? e.message : AI_UNAVAILABLE);
     } finally {
       setBusy(false);
     }

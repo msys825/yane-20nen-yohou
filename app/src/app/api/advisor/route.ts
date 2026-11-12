@@ -2,7 +2,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { calculateEconomics, type HouseholdProfile } from "@/lib/economics";
 import { runWithTools } from "@/lib/server/claude";
-import { takeAiQuota } from "@/lib/server/limits";
+import { AI_UNAVAILABLE, refundAiQuota, takeAiQuota } from "@/lib/server/limits";
 import { loadHouseForAi, type HouseContext } from "@/lib/server/houses";
 
 export const runtime = "nodejs";
@@ -50,12 +50,14 @@ const TOOLS: Anthropic.Beta.BetaTool[] = [
 const PRESENCE_JA = { rarely: "ほとんどいない", sometimes: "時々いる", mostly: "ほとんどいる" } as const;
 
 export async function POST(req: Request) {
-  const { gmlId, profile, messages, context } = (await req.json()) as {
+  const body = (await req.json().catch(() => null)) as {
     gmlId: string;
     profile: HouseholdProfile;
     messages: Anthropic.Beta.BetaMessageParam[];
     context?: HouseContext;
-  };
+  } | null;
+  if (!body || typeof body.gmlId !== "string") return NextResponse.json({ error: "送られた内容を読めませんでした" }, { status: 400 });
+  const { gmlId, profile, messages, context } = body;
   const house = await loadHouseForAi(gmlId, context);
   if (!house) return NextResponse.json({ error: "診断データが見つかりません" }, { status: 404 });
   if (!profile || !(profile.daytimePresence in PRESENCE_JA)) return NextResponse.json({ error: "暮らし方の条件がありません" }, { status: 400 });
@@ -75,6 +77,7 @@ export async function POST(req: Request) {
 ${JSON.stringify({ 実際に払う額: base.netCostYen, 設置費用: base.investmentYen, 東京都の補助: base.subsidyYen, 南が今のまま: base.best, 南に建ったら: base.worst, 前提: base.sources })}
 `;
 
+  try {
   const result = await runWithTools({
     system: SYSTEM + house.summary + household,
     messages,
@@ -94,4 +97,10 @@ ${JSON.stringify({ 実際に払う額: base.netCostYen, 設置費用: base.inves
   });
 
   return NextResponse.json({ messages: result.messages, reply: result.text });
+  } catch (e) {
+    // AI が使えないとき（鍵・残高・混雑など）。理由は記録に残し、利用者にはやさしい案内だけを返す
+    console.error("advisor: AI の呼び出しに失敗", e);
+    refundAiQuota(req);
+    return NextResponse.json({ error: AI_UNAVAILABLE }, { status: 503 });
+  }
 }

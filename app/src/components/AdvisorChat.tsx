@@ -1,9 +1,10 @@
 "use client";
 
 import type Anthropic from "@anthropic-ai/sdk";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { calculateEconomics, type DaytimePresence, type EconomicsResult, type HouseholdProfile } from "@/lib/economics";
 import Markdown from "./Markdown";
+import { AI_UNAVAILABLE, postAi } from "@/lib/aiFetch";
 
 // 簡易診断の家では、住所や南側の建物などの補足を AI に渡す（詳しい診断の家はサーバーが自分で読む）
 export type HouseContext = {
@@ -14,7 +15,16 @@ export type HouseContext = {
   volumes?: { bearing: number; distance: number; nowHeight: number; maxHeight: number }[];
 };
 
-type Props = { gmlId: string; kw: number; kwhNow: number; kwhFuture: number; context?: HouseContext };
+type Props = {
+  gmlId: string;
+  kw: number;
+  kwhNow: number;
+  kwhFuture: number;
+  context?: HouseContext;
+  // 暮らし方は親が持つ（いちばん上の「20年の損得」も、同じ条件で出すため）
+  profile: HouseholdProfile;
+  onProfile: (p: HouseholdProfile) => void;
+};
 
 // 暮らし方は選択肢で入れる（AIの読み違いをなくし、その場で計算する）。AIは結果の説明と、続けての質問に答える
 const PRESENCE: { v: DaytimePresence; label: string }[] = [
@@ -26,13 +36,7 @@ const QUICK_QUESTIONS = ["なぜ損になりうる？", "電気自動車を買�
 
 export { EconomicsCard };
 
-export default function AdvisorChat({ gmlId, kw, kwhNow, kwhFuture, context }: Props) {
-  const [profile, setProfile] = useState<HouseholdProfile>({
-    monthlyBillYen: 12000,
-    daytimePresence: "sometimes",
-    evPlan: false,
-    householdSize: 3,
-  });
+export default function AdvisorChat({ gmlId, kw, kwhNow, kwhFuture, context, profile, onProfile }: Props) {
   const economics: EconomicsResult = useMemo(
     () => calculateEconomics({ kw, kwhNow, kwhFuture, profile }),
     [kw, kwhNow, kwhFuture, profile],
@@ -44,10 +48,16 @@ export default function AdvisorChat({ gmlId, kw, kwhNow, kwhFuture, context }: P
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 条件を変えるたびに1つ進む番号。AI が考えている間に条件が変わったら、古い条件への答えは捨てる
+  const generation = useRef(0);
+
   const update = (p: Partial<HouseholdProfile>) => {
-    setProfile((old) => ({ ...old, ...p }));
+    generation.current += 1;
+    onProfile({ ...profile, ...p });
     setHistory([]);
     setShown([]);
+    setBusy(false);
+    setError(null);
   };
 
   async function ask(text: string, label?: string) {
@@ -55,20 +65,21 @@ export default function AdvisorChat({ gmlId, kw, kwhNow, kwhFuture, context }: P
     setError(null);
     setShown((s) => [...s, { role: "user", text: label ?? text }]);
     setBusy(true);
+    const mine = generation.current;
     try {
-      const res = await fetch("/api/advisor", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ gmlId, profile, context, messages: [...history, { role: "user", content: text }] }),
+      const data = await postAi<{ messages: Anthropic.Beta.BetaMessageParam[]; reply: string }>("/api/advisor", {
+        gmlId,
+        profile,
+        context,
+        messages: [...history, { role: "user", content: text }],
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "エラーが起きました");
+      if (mine !== generation.current) return; // 途中で条件が変わった
       setHistory(data.messages);
       setShown((s) => [...s, { role: "assistant", text: data.reply }]);
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      if (mine === generation.current) setError(e instanceof Error && e.message ? e.message : AI_UNAVAILABLE);
     } finally {
-      setBusy(false);
+      if (mine === generation.current) setBusy(false);
     }
   }
 

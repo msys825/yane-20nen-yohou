@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Cartesian2, Cesium3DTileFeature, Cesium3DTileset, Entity, PointPrimitiveCollection, Primitive, Viewer } from "cesium";
+import type { Cartesian2, Cesium3DTileset, Entity, PointPrimitiveCollection, Primitive, Viewer } from "cesium";
 import { loadCesium, type Cesium } from "@/lib/loadCesium";
 import { NERIMA_BLDG_LOD2_TILESET, toBuildingInfo, type BuildingInfo } from "@/lib/plateau";
 import { fetchDiagnosis, fetchListing, type Diagnosis } from "@/lib/diagnosis";
@@ -38,6 +38,7 @@ type Props = {
   onCompare?: (diagnoses: Diagnosis[]) => void;
   compare: { gmlIds: string[]; requestedAt: number } | null; // 比べる2軒（押すたびに requestedAt が変わる）
   selectGml: { gmlId: string; requestedAt: number } | null; // 例の家などを、地図をクリックせずに選ぶ
+  hasSelection: boolean; // 家を選んでいるか（選ぶのをやめたら、青い色と南側の建物を消す）
   showFuture: boolean; // 選んだ家の南側に建ちうる建物を表示する
   timeIso: string; // 影を計算する時刻（UTC）
   layers: { forecast: boolean; city: boolean }; // 地図のレイヤー：将来の影の予報（家の色）／まち全体の建ちうる建物
@@ -48,10 +49,11 @@ type Props = {
 };
 
 // 区の中心（北緯35.747）を、南から60°見下ろす。高さ9km で区の東西（約11km）が入る
+const GROUND_M = 75; // 練馬区の地面のおよその高さ（楕円体高）
 const WARD_VIEW = { lon: 139.621, lat: 35.747 - 9000 / Math.tan(Math.PI / 3) / 110950, height: 9000, pitch: -60 };
 
 export default function CesiumMap(props: Props) {
-  const { compare, selectGml, showFuture, timeIso, layers, camera, pin } = props;
+  const { compare, selectGml, hasSelection, showFuture, timeIso, layers, camera, pin } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const cb = useRef(props);
   cb.current = props;
@@ -68,7 +70,21 @@ export default function CesiumMap(props: Props) {
   showFutureRef.current = showFuture;
   const timeRef = useRef(timeIso);
   timeRef.current = timeIso;
-  const selectedFeature = useRef<Cesium3DTileFeature | undefined>(undefined);
+  const selectedGml = useRef<string | null>(null);
+
+  // 建物の色。選んだ家だけ青（オレンジは将来の建物だけに使う）。
+  // 建物ごとに色を塗るのではなく、地図全体の決まりとして書く（遠くから選んでも、近づいたあとも青いまま。選び直せば元の色に戻る）
+  const applyStyle = () => {
+    const Cesium = cesiumRef.current;
+    const tileset = tilesetRef.current;
+    if (!Cesium || !tileset) return;
+    // 未来の街を見ている間は、今の建物を青みの灰色にしてオレンジを際立たせる
+    const base = cb.current.layers.city ? "color('#d5dae1')" : "color('#f4efe6')";
+    const id = selectedGml.current;
+    tileset.style = new Cesium.Cesium3DTileStyle({
+      color: id && /^[\w-]+$/.test(id) ? { conditions: [[`\${gml_id} === '${id}'`, "color('#74b0ea')"], ["true", base]] } : base,
+    });
+  };
   const cityData = useRef<Promise<FutureCity> | null>(null);
   const cityPrimitive = useRef<Primitive | null>(null);
   const cityGrow = useRef<{ start: number | null; scaleAt: (k: number) => unknown } | null>(null);
@@ -125,9 +141,9 @@ export default function CesiumMap(props: Props) {
 
       const tileset = await Cesium.Cesium3DTileset.fromUrl(NERIMA_BLDG_LOD2_TILESET, { shadows: Cesium.ShadowMode.ENABLED });
       if (destroyed) return;
-      tileset.style = new Cesium.Cesium3DTileStyle({ color: "color('#f4efe6')" });
       viewer.scene.primitives.add(tileset);
       tilesetRef.current = tileset;
+      applyStyle();
 
       // 例の2軒（家A・家B）の名札。「そっくりな2軒」のときだけ見せる
       const listing = await fetchListing();
@@ -153,7 +169,13 @@ export default function CesiumMap(props: Props) {
       }
 
       const selectHouse = async (gmlId: string, info: BuildingInfo | null) => {
+        selectedGml.current = gmlId;
+        applyStyle();
         const diagnosis = await fetchDiagnosis(gmlId);
+        if (selectedGml.current !== gmlId) return; // 読み込みの間に、別の家が選ばれた
+        // 戸建てでない建物（予報の対象外）では、南側の建ちうる建物を描かない
+        const usage = info?.detailedUsage ?? info?.usage;
+        const notHouse = !diagnosis && !!usage && usage !== "独立住宅";
         let volumes: NearVolume[];
         let lon = info?.lon;
         let lat = info?.lat;
@@ -163,7 +185,7 @@ export default function CesiumMap(props: Props) {
           lat = diagnosis.lat;
           volumes = diagnosis.volumes.map((v) => ({ bearing: v.bearing, distance: v.distance, nowHeight: v.nowHeight, maxHeight: v.maxHeight, reason: v.reason }));
           drawFuture([diagnosis]);
-        } else if (lon && lat) {
+        } else if (lon && lat && !notHouse) {
           // 詳しい診断がない家：南側30m以内でルール上高くなりうる建物を、区全体の「未来の街」のデータから選んで描く
           const city = await loadCity();
           const near = city.buildings
@@ -181,6 +203,7 @@ export default function CesiumMap(props: Props) {
           drawVolumes(near.map(({ b }) => ({ footprint: b.f, baseHeight: b.b, nowHeight: b.h, maxHeight: b.m })));
           volumes = near.map(({ b, d, bearing }) => ({ bearing: Math.round(bearing), distance: Math.round(d * 10) / 10, nowHeight: b.h, maxHeight: b.m }));
         } else {
+          drawFuture([]);
           volumes = [];
         }
         if (lon && lat) {
@@ -214,11 +237,7 @@ export default function CesiumMap(props: Props) {
         const picked = picks.find(
           (p) => p instanceof Cesium.Cesium3DTileFeature || (p as { id?: { properties?: { gmlId?: unknown } } })?.id?.properties?.gmlId,
         );
-        if (selectedFeature.current) selectedFeature.current.color = Cesium.Color.WHITE;
-        selectedFeature.current = undefined;
         if (picked instanceof Cesium.Cesium3DTileFeature) {
-          selectedFeature.current = picked;
-          picked.color = Cesium.Color.fromCssColorString("#74b0ea"); // 選んだ家は青（オレンジは将来の建物だけに使う）
           const p: Record<string, unknown> = {};
           for (const id of picked.getPropertyIds()) p[id] = picked.getProperty(id);
           await selectHouse(String(p["gml_id"]), toBuildingInfo(p));
@@ -307,6 +326,15 @@ export default function CesiumMap(props: Props) {
     viewer.clock.currentTime = Cesium.JulianDate.fromIso8601(timeIso);
   }, [timeIso, readyTick]);
 
+  // 家を選ぶのをやめたら（戻る・住所で探す・区全体）、青い色と、南側の建ちうる建物を消す
+  useEffect(() => {
+    if (hasSelection) return;
+    selectedGml.current = null;
+    applyStyle();
+    if (!compare) drawFuture([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasSelection, compare, readyTick]);
+
   // 例の家などを、地図をクリックせずに選ぶ
   useEffect(() => {
     if (!selectGml || !selectHouseRef.current) return;
@@ -334,9 +362,10 @@ export default function CesiumMap(props: Props) {
       });
     } else {
       // 探した場所を、南の斜め上から見下ろす（家を見分けてクリックしやすい高さ）
+      // 地面の高さ（練馬区はおよそ75m）の分だけカメラを上げて、目印が画面の真ん中に来るようにする
       const h = 320;
       viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(camera.lon, camera.lat - h / Math.tan((50 * Math.PI) / 180) / 110950, h),
+        destination: Cesium.Cartesian3.fromDegrees(camera.lon, camera.lat - h / Math.tan((50 * Math.PI) / 180) / 110950, GROUND_M + h),
         orientation: { heading: 0, pitch: Cesium.Math.toRadians(-50), roll: 0 },
         duration: 2.0,
       });
@@ -352,7 +381,7 @@ export default function CesiumMap(props: Props) {
     pinEntity.current = null;
     if (!pin) return;
     pinEntity.current = viewer.entities.add({
-      position: Cesium.Cartesian3.fromDegrees(pin.lon, pin.lat, 60),
+      position: Cesium.Cartesian3.fromDegrees(pin.lon, pin.lat, GROUND_M),
       point: { pixelSize: 14, color: Cesium.Color.fromCssColorString("#1c7ed6"), outlineColor: Cesium.Color.WHITE, outlineWidth: 3, disableDepthTestDistance: Number.POSITIVE_INFINITY },
       label: {
         text: "探した場所",
@@ -441,10 +470,8 @@ export default function CesiumMap(props: Props) {
   useEffect(() => {
     const viewer = viewerRef.current;
     const Cesium = cesiumRef.current;
-    const tileset = tilesetRef.current;
     if (!viewer || !Cesium) return;
-    // 未来の街を見ている間は、今の建物を青みの灰色にしてオレンジを際立たせる
-    if (tileset) tileset.style = new Cesium.Cesium3DTileStyle({ color: layers.city ? "color('#d5dae1')" : "color('#f4efe6')" });
+    applyStyle();
     if (cityPrimitive.current) {
       cityPrimitive.current.show = layers.city;
       if (layers.city && cityGrow.current) cityGrow.current.start = null; // もう一度伸ばす
@@ -500,7 +527,6 @@ export default function CesiumMap(props: Props) {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [layers.city, readyTick]);
 
   return <div ref={containerRef} className="h-full w-full" />;
