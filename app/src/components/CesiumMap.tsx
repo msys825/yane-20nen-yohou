@@ -38,7 +38,9 @@ type Props = {
   onSelect?: (s: Selection | null) => void;
   onCompare?: (diagnoses: Diagnosis[]) => void;
   compare: { gmlIds: string[]; requestedAt: number } | null; // 比べる2軒（押すたびに requestedAt が変わる）
-  selectGml: { gmlId: string; requestedAt: number } | null; // 例の家などを、地図をクリックせずに選ぶ
+  // 例の家などを、地図をクリックせずに選ぶ。lon・lat があれば、その場所へ行って地図の建物から探す（共有されたURLから開くとき）
+  selectGml: { gmlId: string; lon?: number; lat?: number; requestedAt: number } | null;
+  onSelectFailed?: (at: { lon: number; lat: number }) => void; // URLの家が地図で見つからなかった
   hasSelection: boolean; // 家を選んでいるか（選ぶのをやめたら、青い色と南側の建物を消す）
   showFuture: boolean; // 選んだ家の南側に建ちうる建物を表示する
   timeIso: string; // 影を計算する時刻（UTC）
@@ -368,7 +370,42 @@ export default function CesiumMap(props: Props) {
   // 例の家などを、地図をクリックせずに選ぶ
   useEffect(() => {
     if (!selectGml || !selectHouseRef.current) return;
-    selectHouseRef.current(selectGml.gmlId, null);
+    const viewer = viewerRef.current;
+    const Cesium = cesiumRef.current;
+    const tileset = tilesetRef.current;
+    const { gmlId, lon, lat } = selectGml;
+    if (lon === undefined || lat === undefined || !viewer || !Cesium || !tileset) {
+      selectHouseRef.current(gmlId, null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      // 詳しい診断のある家は、場所もデータに入っているので、そのまま選べる
+      if (await fetchDiagnosis(gmlId)) {
+        if (!cancelled) selectHouseRef.current?.(gmlId, null);
+        return;
+      }
+      // それ以外の家は、住所や階数が地図の建物に入っている。その家が見える位置へ行き、建物が読みこまれるのを待って探す
+      const back = 110;
+      const pitch = 38;
+      viewer.camera.setView({
+        destination: Cesium.Cartesian3.fromDegrees(lon, lat - back / 110950, groundM(lon, lat) + 7 + back * Math.tan((pitch * Math.PI) / 180)),
+        orientation: { heading: 0, pitch: Cesium.Math.toRadians(-pitch), roll: 0 },
+      });
+      for (let i = 0; i < 40 && !cancelled; i++) {
+        await new Promise((r) => setTimeout(r, 300));
+        const props = findFeatureProps(tileset, gmlId);
+        if (props) {
+          if (!cancelled) selectHouseRef.current?.(gmlId, toBuildingInfo(props));
+          return;
+        }
+      }
+      if (!cancelled) cb.current.onSelectFailed?.({ lon, lat });
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectGml, readyTick]);
 
   // カメラの移動（区全体／住所で探した場所）
@@ -563,6 +600,31 @@ export default function CesiumMap(props: Props) {
 }
 
 // 地図の準備ができたことを、ほかの effect に知らせる（準備前に来た指示を、準備後にやり直すため）
+// 読みこみ済みの地図の建物から、gml_id が合うものを探して、その属性を返す
+function findFeatureProps(tileset: Cesium3DTileset, gmlId: string): Record<string, unknown> | null {
+  type Content = { featuresLength?: number; getFeature?: (i: number) => { getProperty: (k: string) => unknown; getPropertyIds: () => string[] } };
+  type Tile = { content?: Content; children?: Tile[] };
+  const stack: Tile[] = [tileset.root as unknown as Tile];
+  while (stack.length) {
+    const tile = stack.pop()!;
+    try {
+      const c = tile.content;
+      const n = c?.featuresLength ?? 0;
+      for (let i = 0; i < n; i++) {
+        const f = c!.getFeature!(i);
+        if (f.getProperty("gml_id") !== gmlId) continue;
+        const p: Record<string, unknown> = {};
+        for (const id of f.getPropertyIds()) p[id] = f.getProperty(id);
+        return p;
+      }
+    } catch {
+      // まだ読みこみ中のタイルは飛ばす
+    }
+    for (const child of tile.children ?? []) stack.push(child);
+  }
+  return null;
+}
+
 function useReadyTick(): [number, () => void] {
   const [n, setN] = useState(0);
   const bump = useCallback(() => setN((x) => x + 1), []);

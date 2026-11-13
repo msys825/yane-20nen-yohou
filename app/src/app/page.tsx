@@ -52,7 +52,9 @@ export default function Home() {
   const [city, setCity] = useState<FutureCity | null>(null);
   const [camera, setCamera] = useState<CameraRequest | null>(null);
   const [pin, setPin] = useState<Place | null>(null);
-  const [selectGml, setSelectGml] = useState<{ gmlId: string; requestedAt: number } | null>(null);
+  const [selectGml, setSelectGml] = useState<{ gmlId: string; lon?: number; lat?: number; requestedAt: number } | null>(null);
+  // ブラウザの「戻る」「進む」や、開いたURLに合わせて画面を変えている間は、URLの履歴を足さない
+  const fromHistory = useRef(false);
   const [showFuture, setShowFuture] = useState(true);
   // 暮らし方。家を変えても残す。いちばん上の「20年の損得」と、下のお金の表を、同じ条件で出す
   const [profile, setProfile] = useState<HouseholdProfile>(DEFAULT_PROFILE);
@@ -81,11 +83,40 @@ export default function Home() {
       openPair();
     } else if (q.get("view") === "ward") goWard();
     else if (q.get("example")) openExample();
+    else openHouseFromUrl();
     urlDone.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pairIds]);
 
+  // 家ごとのURL（?house=建物のID&at=経度,緯度）。家族に送ったり、あとで開き直したりできる
+  const openHouseFromUrl = () => {
+    const h = parseHouseUrl(window.location.search);
+    if (!h) return false;
+    fromHistory.current = true;
+    setCompare(null);
+    setSelectGml({ ...h, requestedAt: Date.now() });
+    return true;
+  };
+  // 家の画面を出たら、URLからも家を外す
+  const leaveHouseUrl = () => {
+    if (fromHistory.current || !new URLSearchParams(window.location.search).has("house")) return;
+    window.history.pushState(null, "", window.location.pathname);
+  };
+  // ブラウザの「戻る」「進む」
+  useEffect(() => {
+    const onPop = () => {
+      if (openHouseFromUrl()) return;
+      fromHistory.current = true;
+      goHome();
+      fromHistory.current = false;
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const goHome = () => {
+    leaveHouseUrl();
     setView("home");
     setLayers((l) => ({ ...l, city: false }));
     setSelection(null);
@@ -95,6 +126,7 @@ export default function Home() {
     setCamera({ kind: "ward", requestedAt: Date.now() }); // 地図も、最初の区全体の眺めに戻す
   };
   const goWard = () => {
+    leaveHouseUrl();
     setView("ward");
     setSelection(null);
     setCompare(null);
@@ -103,6 +135,7 @@ export default function Home() {
     setCamera({ kind: "ward", requestedAt: Date.now() });
   };
   const goPlace = (p: Place) => {
+    leaveHouseUrl();
     setPin(p);
     setSelection(null);
     setCompare(null);
@@ -114,6 +147,7 @@ export default function Home() {
     setSelectGml({ gmlId: EXAMPLE_GML, requestedAt: Date.now() });
   };
   const openPair = () => {
+    leaveHouseUrl();
     setSelection(null);
     setPin(null);
     setLayers((l) => ({ ...l, city: false }));
@@ -133,6 +167,10 @@ export default function Home() {
             setCompare(null);
             setPin(null);
             if (!s) return;
+            // 選んだ家をURLに入れる（同じ家なら足さない）
+            const url = houseUrl(s);
+            if (url && window.location.search !== url) window.history[fromHistory.current ? "replaceState" : "pushState"](null, "", url);
+            fromHistory.current = false;
             setView("house");
             setLayers((l) => ({ ...l, city: false })); // 家では、その家の南側の建物だけを見せる
             if (!s.diagnosis && s.info?.gmlId) fetchSimple(s.info.gmlId).then(setSimple);
@@ -143,6 +181,11 @@ export default function Home() {
           }}
           compare={compare}
           selectGml={selectGml}
+          onSelectFailed={(at) => {
+            // URLの家が見つからなかったら、その場所を見せて、選び直してもらう
+            fromHistory.current = false;
+            goPlace({ title: "リンクの場所", ...at });
+          }}
           hasSelection={!!selection}
           showFuture={futureVisible}
           timeIso={timeIso}
@@ -433,6 +476,45 @@ function FoundPanel({ place, onBack }: { place: Place; onBack: () => void }) {
   );
 }
 
+// 家ごとのURLの中身（?house=建物のID&at=経度,緯度）
+function houseUrl(s: Selection): string | null {
+  const gmlId = s.info?.gmlId ?? s.diagnosis?.gmlId;
+  const lon = s.info?.lon ?? s.diagnosis?.lon;
+  const lat = s.info?.lat ?? s.diagnosis?.lat;
+  if (!gmlId || !lon || !lat) return null;
+  return `?house=${gmlId}&at=${lon.toFixed(5)},${lat.toFixed(5)}`;
+}
+function parseHouseUrl(search: string): { gmlId: string; lon: number; lat: number } | null {
+  const q = new URLSearchParams(search);
+  const gmlId = q.get("house") ?? "";
+  const [lon, lat] = (q.get("at") ?? "").split(",").map(Number);
+  // 練馬区のあたりの場所だけ受け付ける
+  if (!/^bldg_[0-9a-f-]{36}$/.test(gmlId) || !(lon > 139.5 && lon < 139.75) || !(lat > 35.68 && lat < 35.8)) return null;
+  return { gmlId, lon, lat };
+}
+
+// 今のページのURLをコピーする（家族に送る、あとで開き直す）
+function CopyLink() {
+  const [done, setDone] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          setDone(true);
+          setTimeout(() => setDone(false), 2000);
+        } catch {
+          // コピーできない環境では、何もしない（URLはアドレス欄にある）
+        }
+      }}
+      className="text-sm text-neutral-500 hover:text-neutral-900"
+    >
+      {done ? "コピーしました" : "リンクをコピー"}
+    </button>
+  );
+}
+
 function BackLink({ onBack }: { onBack: () => void }) {
   return (
     <button type="button" onClick={onBack} className="text-sm text-neutral-500 hover:text-neutral-900">
@@ -549,7 +631,10 @@ function HousePanel(props: {
   return (
     <div className="text-sm">
       <div className="space-y-3 p-5 pb-3">
-        <BackLink onBack={onBack} />
+        <div className="flex items-center justify-between">
+          <BackLink onBack={onBack} />
+          <CopyLink />
+        </div>
         <p className="text-base font-bold">
           {h.address.replace("東京都", "")}
           <span className={`ml-2 rounded px-1.5 py-0.5 align-middle text-xs font-bold ${h.kind === "detailed" ? "bg-sky-100 text-sky-800" : "bg-neutral-100 text-neutral-600"}`}>
