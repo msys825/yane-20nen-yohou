@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Cartesian2, Cesium3DTileset, Entity, PointPrimitiveCollection, Primitive, Viewer } from "cesium";
+import { fetchGround, groundAt, type Ground } from "@/lib/ground";
 import { loadCesium, type Cesium } from "@/lib/loadCesium";
 import { NERIMA_BLDG_LOD2_TILESET, toBuildingInfo, type BuildingInfo } from "@/lib/plateau";
 import { fetchDiagnosis, fetchListing, type Diagnosis } from "@/lib/diagnosis";
@@ -49,7 +50,7 @@ type Props = {
 };
 
 // 区の中心（北緯35.747）を、南から60°見下ろす。高さ9km で区の東西（約11km）が入る
-const GROUND_M = 75; // 練馬区の地面のおよその高さ（楕円体高）
+const GROUND_M = 75; // 練馬区の地面のおよその高さ（楕円体高）。地面の表を読めなかったときだけ使う
 const WARD_VIEW = { lon: 139.621, lat: 35.747 - 9000 / Math.tan(Math.PI / 3) / 110950, height: 9000, pitch: -60 };
 
 export default function CesiumMap(props: Props) {
@@ -60,6 +61,9 @@ export default function CesiumMap(props: Props) {
   const viewerRef = useRef<Viewer | null>(null);
   const cesiumRef = useRef<Cesium | null>(null);
   const tilesetRef = useRef<Cesium3DTileset | null>(null);
+  const groundRef = useRef<Ground | null>(null);
+  // その場所の地面の高さ（楕円体高）
+  const groundM = (lon: number, lat: number) => (groundRef.current ? groundAt(groundRef.current, lon, lat) : GROUND_M);
   const [readyTick, setReadyTick] = useReadyTick();
   const futureEntities = useRef<Entity[]>([]);
   const highlightEntities = useRef<Entity[]>([]);
@@ -101,9 +105,34 @@ export default function CesiumMap(props: Props) {
     let cleanup = () => {};
 
     (async () => {
-      const Cesium = await loadCesium();
+      const [Cesium, ground] = await Promise.all([loadCesium(), fetchGround().catch(() => null)]);
       if (destroyed || !containerRef.current) return;
       cesiumRef.current = Cesium;
+      groundRef.current = ground;
+
+      // 地面：背景の地図を、建物の足もとの高さまで持ち上げる
+      // （建物は楕円体高で約51〜95mにある。地図が高さ0mのままだと、ななめから見たときに建物と約70mずれる）
+      const SAMPLES = 33;
+      const tiling = new Cesium.GeographicTilingScheme();
+      const terrainProvider = ground
+        ? new Cesium.CustomHeightmapTerrainProvider({
+            width: SAMPLES,
+            height: SAMPLES,
+            tilingScheme: tiling,
+            callback: (x, y, level) => {
+              const r = tiling.tileXYToRectangle(x, y, level);
+              const west = Cesium.Math.toDegrees(r.west);
+              const north = Cesium.Math.toDegrees(r.north);
+              const dLon = Cesium.Math.toDegrees(r.east - r.west) / (SAMPLES - 1);
+              const dLat = Cesium.Math.toDegrees(r.north - r.south) / (SAMPLES - 1);
+              // 北西の角から、西→東、北→南の順
+              const out = new Float32Array(SAMPLES * SAMPLES);
+              for (let j = 0; j < SAMPLES; j++)
+                for (let i = 0; i < SAMPLES; i++) out[j * SAMPLES + i] = groundAt(ground, west + i * dLon, north - j * dLat);
+              return out;
+            },
+          })
+        : undefined;
 
       // 背景地図：国土地理院 淡色地図（ズーム5〜18。ない段階を読みに行くと地図が表示されなくなる）
       const baseLayer = new Cesium.ImageryLayer(
@@ -116,6 +145,7 @@ export default function CesiumMap(props: Props) {
       );
       const viewer = new Cesium.Viewer(containerRef.current, {
         baseLayer,
+        terrainProvider,
         baseLayerPicker: false,
         geocoder: false,
         homeButton: false,
@@ -217,7 +247,7 @@ export default function CesiumMap(props: Props) {
               roof = undefined;
             }
           }
-          if (roof === undefined || !Number.isFinite(roof)) roof = (near0Base ?? 75) + 6;
+          if (roof === undefined || !Number.isFinite(roof)) roof = (near0Base ?? groundM(lon, lat)) + 6;
           const back = 110;
           const pitch = 38;
           viewer.camera.flyTo({
@@ -362,10 +392,10 @@ export default function CesiumMap(props: Props) {
       });
     } else {
       // 探した場所を、南の斜め上から見下ろす（家を見分けてクリックしやすい高さ）
-      // 地面の高さ（練馬区はおよそ75m）の分だけカメラを上げて、目印が画面の真ん中に来るようにする
+      // 地面の高さの分だけカメラを上げて、目印が画面の真ん中に来るようにする
       const h = 320;
       viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(camera.lon, camera.lat - h / Math.tan((50 * Math.PI) / 180) / 110950, GROUND_M + h),
+        destination: Cesium.Cartesian3.fromDegrees(camera.lon, camera.lat - h / Math.tan((50 * Math.PI) / 180) / 110950, groundM(camera.lon, camera.lat) + h),
         orientation: { heading: 0, pitch: Cesium.Math.toRadians(-50), roll: 0 },
         duration: 2.0,
       });
@@ -381,7 +411,7 @@ export default function CesiumMap(props: Props) {
     pinEntity.current = null;
     if (!pin) return;
     pinEntity.current = viewer.entities.add({
-      position: Cesium.Cartesian3.fromDegrees(pin.lon, pin.lat, GROUND_M),
+      position: Cesium.Cartesian3.fromDegrees(pin.lon, pin.lat, groundM(pin.lon, pin.lat)),
       point: { pixelSize: 14, color: Cesium.Color.fromCssColorString("#1c7ed6"), outlineColor: Cesium.Color.WHITE, outlineWidth: 3, disableDepthTestDistance: Number.POSITIVE_INFINITY },
       label: {
         text: "探した場所",
