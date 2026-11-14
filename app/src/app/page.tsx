@@ -23,7 +23,8 @@ function jstToUtcIso(hour: number): string {
 }
 
 type View = "home" | "found" | "house" | "ward" | "pair";
-type Place = { title: string; lon: number; lat: number };
+// precise：「〇番〇号」まで分かった住所（目印が家のすぐ前に来るので、近くまで寄る）
+type Place = { title: string; lon: number; lat: number; precise?: boolean };
 
 // 国土地理院の住所検索（登録不要）。練馬区の住所だけを返す
 async function searchAddress(q: string): Promise<Place[]> {
@@ -39,7 +40,12 @@ async function searchAddress(q: string): Promise<Place[]> {
     .filter((i) => i.properties.title.includes("練馬区"))
     .filter((i) => wardOnly || i.properties.title !== "東京都練馬区")
     .slice(0, 6)
-    .map((i) => ({ title: i.properties.title.replace("東京都", ""), lon: i.geometry.coordinates[0], lat: i.geometry.coordinates[1] }));
+    .map((i) => ({
+      title: i.properties.title.replace("東京都", ""),
+      lon: i.geometry.coordinates[0],
+      lat: i.geometry.coordinates[1],
+      precise: i.properties.title.endsWith("号"),
+    }));
 }
 
 export default function Home() {
@@ -140,7 +146,7 @@ export default function Home() {
     setSelection(null);
     setCompare(null);
     setView("found");
-    setCamera({ kind: "point", lon: p.lon, lat: p.lat, requestedAt: Date.now() });
+    setCamera({ kind: "point", lon: p.lon, lat: p.lat, close: p.precise, requestedAt: Date.now() });
   };
   const openExample = () => {
     setCompare(null);
@@ -405,7 +411,7 @@ function SearchBox({ onPick, compact }: { onPick: (p: Place) => void; compact?: 
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder={compact && narrow ? "例：北町五丁目" : "練馬区の住所（例：北町五丁目）"}
+          placeholder={compact && narrow ? "例：豊玉北6-12-1" : "練馬区の住所（例：豊玉北6-12-1）"}
           className={`min-w-0 flex-1 px-3 text-neutral-900 outline-none ${compact ? "py-2 text-sm" : "py-3 text-base"}`}
           aria-label="練馬区の住所"
         />

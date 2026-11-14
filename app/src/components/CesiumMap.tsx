@@ -32,7 +32,7 @@ export type Selection = { info: BuildingInfo | null; diagnosis: Diagnosis | null
 export type CameraRequest =
   | { kind: "ward"; requestedAt: number }
   | { kind: "wardOblique"; requestedAt: number } // 未来の街を見るときの、斜めに低い視点
-  | { kind: "point"; lon: number; lat: number; requestedAt: number };
+  | { kind: "point"; lon: number; lat: number; close?: boolean; requestedAt: number }; // close：番号まで分かった住所。近くまで寄る
 
 type Props = {
   onSelect?: (s: Selection | null) => void;
@@ -430,7 +430,8 @@ export default function CesiumMap(props: Props) {
     } else {
       // 探した場所を、南の斜め上から見下ろす（家を見分けてクリックしやすい高さ）
       // 地面の高さの分だけカメラを上げて、目印が画面の真ん中に来るようにする
-      const h = 320;
+      // 番号まで分かった住所は、目印が家のすぐ前に来るので、近くまで寄る（家を自動では選ばない。目印は道路ぎわを指し、となりの家と区別できないため）
+      const h = camera.close ? 130 : 320;
       viewer.camera.flyTo({
         destination: Cesium.Cartesian3.fromDegrees(camera.lon, camera.lat - h / Math.tan((50 * Math.PI) / 180) / 110950, groundM(camera.lon, camera.lat) + h),
         orientation: { heading: 0, pitch: Cesium.Math.toRadians(-50), roll: 0 },
