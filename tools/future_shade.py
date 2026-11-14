@@ -12,7 +12,10 @@ from pyproj import Transformer
 from plateau_tiles import building_triangles, read_batch_table
 from roof_from_pc import points_in_triangles, upward_triangles
 from solar_engine import annual_generation, horizon_profile
-from zoning import height_limits, max_buildable_height
+from zoning import BOUNDARY_SETBACK, height_limits, max_buildable_height, slant_limit
+
+# 将来の建物の形。1（既定）＝高度地区の斜線で切る。0＝箱のまま（2026-11-07 の提出時の計算）
+SLANT = __import__("os").environ.get("SLANT", "1") == "1"
 
 _LL_TO_PLANE9 = Transformer.from_crs(4326, 6677, always_xy=True)
 _PLANE9_TO_LL = Transformer.from_crs(6677, 4326, always_xy=True)
@@ -68,7 +71,8 @@ def future_volumes(index: BuildingIndex, house_k: int, ground: float, radius: fl
         if h_max is None or r["h"] is None or h_max < r["h"] + 3:
             continue
         out.append({"k": k, "gml_id": r["gml_id"], "now_h": r["h"], "max_h": h_max, "why": why,
-                    "distance_m": round(float(math.hypot(dx, dy)), 1), "bearing": round(bearing), "zone": lim.get("zone")})
+                    "distance_m": round(float(math.hypot(dx, dy)), 1), "bearing": round(bearing), "zone": lim.get("zone"),
+                    "kind": r.get("hd", 0)})
     return out
 
 
@@ -83,12 +87,31 @@ def volume_points(tris: np.ndarray, top_z: float, step: float = 0.5) -> np.ndarr
     return np.c_[x[m], y[m], np.full(m.sum(), top_z)]
 
 
+def volume_points_slant(tris: np.ndarray, ground: float, now_h: float, max_h: float, kind: int, step: float = 0.5) -> np.ndarray:
+    """高度地区の斜線で切った形の、上面の点の集まり。北側の境界は、建物の北の端から BOUNDARY_SETBACK だけ北と置く。
+    今の高さより低くはしない（建て替えなければ、今の高さのまま残る）"""
+    p = volume_points(tris, ground, step)
+    d = np.maximum(0.0, p[:, 1].max() + step / 2 + BOUNDARY_SETBACK - p[:, 1])
+    p[:, 2] = ground + np.maximum(now_h, np.minimum(max_h, slant_limit(kind, d)))
+    return p
+
+
 def future_generation(planes, obstacles: np.ndarray, index: BuildingIndex, house_k: int, ground: float,
                       weather: dict, lat: float, lon: float) -> dict:
     """今と、南側が最大まで建て替わったときの年間発電量"""
     now = annual_generation(planes, [horizon_profile(p.center, obstacles) for p in planes], weather, lat, lon)
     vols = future_volumes(index, house_k, ground)
-    extra = [volume_points(index.triangles(v["k"]), ground + v["max_h"]) for v in vols]
+    if SLANT:
+        kept, extra = [], []
+        for v in vols:
+            p = volume_points_slant(index.triangles(v["k"]), ground, v["now_h"], v["max_h"], v["kind"])
+            v["eff_h"] = round(float(p[:, 2].max() - ground), 1)  # 斜線で切ったあとの、いちばん高い所
+            if v["eff_h"] >= v["now_h"] + 3:  # 斜線で切ると 3m 以上は高くできない建物は、数えない
+                kept.append(v)
+                extra.append(p)
+        vols = kept
+    else:
+        extra = [volume_points(index.triangles(v["k"]), ground + v["max_h"]) for v in vols]
     obs_future = np.concatenate([obstacles, *extra]) if extra else obstacles
     fut = annual_generation(planes, [horizon_profile(p.center, obs_future) for p in planes], weather, lat, lon)
     change = (fut["kwh"] - now["kwh"]) / now["kwh"] if now["kwh"] else 0.0

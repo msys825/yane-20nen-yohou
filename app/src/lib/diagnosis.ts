@@ -4,7 +4,9 @@ export type FutureVolume = {
   footprint: [number, number][]; // [経度, 緯度]
   baseHeight: number; // 建物の底の楕円体高（m）
   nowHeight: number; // 今の高さ（m）
-  maxHeight: number; // 建ててよい最大の高さ（m）
+  maxHeight: number; // 建ててよい最大の高さ（m）。容積率・用途地域・高度地区の最高限度から
+  kind?: number; // 高度地区の種類（1〜3）。北側からの斜線で、形を切るのに使う。0 は不明・指定なし
+  effHeight?: number; // 斜線で切ったあとの、いちばん高い所（m）
   reason: string; // 最大の高さが何で決まったか
   distance: number; // 家からの距離（m）
   bearing: number; // 家から見た方位（度、北=0）
@@ -35,6 +37,7 @@ export type Diagnosis = {
     storeys: number | null;
     nowHeight: number | null;
     maxHeight: number | null;
+    effHeight?: number | null; // 高度地区の斜線で切ったあとの、いちばん高い所
     reason: string;
     zone: string | null;
     floorAreaRate: number | null;

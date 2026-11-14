@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Cartesian2, Cesium3DTileset, Entity, PointPrimitiveCollection, Primitive, Viewer } from "cesium";
 import { fetchGround, groundAt, type Ground } from "@/lib/ground";
+import { slantSteps } from "@/lib/slant";
 import { loadCesium, type Cesium } from "@/lib/loadCesium";
 import { NERIMA_BLDG_LOD2_TILESET, toBuildingInfo, type BuildingInfo } from "@/lib/plateau";
 import { fetchDiagnosis, fetchListing, type Diagnosis } from "@/lib/diagnosis";
@@ -21,7 +22,8 @@ export type FutureCity = {
   count: number; // ルール上、今より3m以上高く建て替えられる建物の数
   candidates: number; // 範囲の中の建物の数
   addedVolumeM3: number;
-  buildings: { f: [number, number][]; b: number; h: number; m: number }[];
+  // f＝外形、b＝底の高さ、h＝今の高さ、m＝ルール上の最大の高さ、k＝高度地区の種類（斜線）、e＝斜線で切ったあとのいちばん高い所
+  buildings: { f: [number, number][]; b: number; h: number; m: number; k?: number; e?: number }[];
 };
 
 // 選んだ家の南側で、ルール上高くなりうる建物（画面の一覧と AI への説明に使う）
@@ -215,7 +217,7 @@ export default function CesiumMap(props: Props) {
         if (diagnosis) {
           lon = diagnosis.lon;
           lat = diagnosis.lat;
-          volumes = diagnosis.volumes.map((v) => ({ bearing: v.bearing, distance: v.distance, nowHeight: v.nowHeight, maxHeight: v.maxHeight, reason: v.reason }));
+          volumes = diagnosis.volumes.map((v) => ({ bearing: v.bearing, distance: v.distance, nowHeight: v.nowHeight, maxHeight: v.effHeight ?? v.maxHeight, reason: v.reason }));
           drawFuture([diagnosis]);
         } else if (lon && lat && !notHouse) {
           // 詳しい診断がない家：南側30m以内でルール上高くなりうる建物を、区全体の「未来の街」のデータから選んで描く
@@ -232,8 +234,8 @@ export default function CesiumMap(props: Props) {
             .sort((a, b) => a.d - b.d);
           near0Base = near[0]?.b.b;
           drawFuture([]);
-          drawVolumes(near.map(({ b }) => ({ footprint: b.f, baseHeight: b.b, nowHeight: b.h, maxHeight: b.m })));
-          volumes = near.map(({ b, d, bearing }) => ({ bearing: Math.round(bearing), distance: Math.round(d * 10) / 10, nowHeight: b.h, maxHeight: b.m }));
+          drawVolumes(near.map(({ b }) => ({ footprint: b.f, baseHeight: b.b, nowHeight: b.h, maxHeight: b.m, kind: b.k })));
+          volumes = near.map(({ b, d, bearing }) => ({ bearing: Math.round(bearing), distance: Math.round(d * 10) / 10, nowHeight: b.h, maxHeight: b.e ?? b.m }));
         } else {
           drawFuture([]);
           volumes = [];
@@ -317,12 +319,16 @@ export default function CesiumMap(props: Props) {
     }
   }
 
-  function drawVolumes(volumes: { footprint: [number, number][]; baseHeight: number; nowHeight: number; maxHeight: number }[]) {
+  function drawVolumes(volumes: { footprint: [number, number][]; baseHeight: number; nowHeight: number; maxHeight: number; kind?: number }[]) {
     const viewer = viewerRef.current;
     const Cesium = cesiumRef.current;
     if (!viewer || !Cesium) return;
     if (showFutureRef.current) growStart.current = performance.now();
-    for (const v of volumes) {
+    // 高度地区の斜線で切った形にする：北から南へ、だんだん高くなる段に分けて描く
+    const pieces = volumes.flatMap((vol) =>
+      slantSteps(vol.footprint, vol.kind, vol.nowHeight, vol.maxHeight).map((s) => ({ ...vol, footprint: s.ring, maxHeight: s.height })),
+    );
+    for (const v of pieces) {
       // 今の高さから、ルール上の最大の高さまで伸びていく（伸びる様子で「建て替わりうる」ことを伝える）
       const extruded = new Cesium.CallbackProperty(() => {
         const t = Math.min(1, Math.max(0, (performance.now() - growStart.current) / GROW_MS));
@@ -552,17 +558,20 @@ export default function CesiumMap(props: Props) {
       if (cancelled || cityPrimitive.current) return;
       const ramp = ["#F59F6B", "#E8590C", "#B83C0B", "#7A2306"]; // 今より高くなる分が大きいほど濃い
       const colorOf = (grow: number) => ramp[grow < 6 ? 0 : grow < 10 ? 1 : grow < 15 ? 2 : 3];
-      const instances = city.buildings.map(
-        (b) =>
-          new Cesium.GeometryInstance({
-            geometry: new Cesium.PolygonGeometry({
-              polygonHierarchy: new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArray(b.f.flat())),
-              height: b.b,
-              extrudedHeight: b.b + b.m,
-              vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
+      // 高度地区の斜線で切った形（北から南へ高くなる段）。数が多いので、段は 4m ごとにする
+      const instances = city.buildings.flatMap((b) =>
+        slantSteps(b.f, b.k, b.h, b.m, 4).map(
+          (s) =>
+            new Cesium.GeometryInstance({
+              geometry: new Cesium.PolygonGeometry({
+                polygonHierarchy: new Cesium.PolygonHierarchy(Cesium.Cartesian3.fromDegreesArray(s.ring.flat())),
+                height: b.b,
+                extrudedHeight: b.b + s.height,
+                vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
+              }),
+              attributes: { color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.fromCssColorString(colorOf((b.e ?? b.m) - b.h))) },
             }),
-            attributes: { color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.fromCssColorString(colorOf(b.m - b.h))) },
-          }),
+        ),
       );
       const ground = city.buildings.reduce((s, b) => s + b.b, 0) / Math.max(1, city.buildings.length);
       const enu = Cesium.Transforms.eastNorthUpToFixedFrame(Cesium.Cartesian3.fromDegrees(city.center[0], city.center[1], ground));

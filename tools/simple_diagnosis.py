@@ -28,6 +28,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from plateau_tiles import tile_building_triangles  # noqa: E402
 from roof_from_pc import upward_triangles  # noqa: E402
 from solar_engine import KPY, load_weather, sun_position  # noqa: E402
+from zoning import BOUNDARY_SETBACK, effective_max, slant_limit  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 TILT, AZIMUTH, ALBEDO = 25.0, 180.0, 0.15
@@ -36,6 +37,8 @@ BINS = 72
 EYE_DROP = float(__import__("os").environ.get("EYE_DROP", "2.0"))  # パネルの高さ＝屋上の高さ − この値 [m]。52軒の詳しい診断と最もよく合う値
 # 詳しい診断（点群）の家から決めた係数（2026-11-05、比べた46軒）
 KW_PER_ROOF_M2 = 0.045  # 屋根の面積 1m² あたり、パネルを置ける量 [kW]（中央値 0.0448）
+# 将来の建物の形。1（既定）＝高度地区の斜線（北側の境界からの斜めの高さ制限）で切る。0＝箱のまま（2026-11-07 の提出時の計算）
+SLANT = __import__("os").environ.get("SLANT", "1") == "1"
 OPEN_FACTOR = 0.92  # 1kW あたりの発電：真南25° と置いた値 → 実際の屋根の向きのばらつきに合わせる（1,072 ÷ 1,166）
 
 
@@ -133,6 +136,21 @@ SUN: dict = {}
 G: dict = {}
 
 
+def inner_grid(hull: np.ndarray, step: float = 2.0) -> np.ndarray:
+    """外形の内側に 2m おきの点を置く（斜めの屋根は、建物の内側がいちばん高く見えることがあるため）"""
+    x0, y0 = hull.min(axis=0)
+    x1, y1 = hull.max(axis=0)
+    gx, gy = np.meshgrid(np.arange(x0 + step / 2, x1, step), np.arange(y0 + step / 2, y1, step))
+    p = np.column_stack([gx.ravel(), gy.ravel()])
+    if not len(p):
+        return p
+    sign = np.zeros(len(p))
+    for i in range(len(hull)):
+        a, b = hull[i], hull[(i + 1) % len(hull)]
+        sign += np.sign((b[0] - a[0]) * (p[:, 1] - a[1]) - (b[1] - a[1]) * (p[:, 0] - a[0]))
+    return p[np.abs(sign) >= len(hull) - 1e-9]
+
+
 def kwh_per_kw(horizon: np.ndarray) -> float:
     beam = 0.0
     for i, (el, cum) in enumerate(SUN["bins"]):
@@ -177,8 +195,43 @@ def one(k: int) -> tuple | None:
     dist = np.hypot(dx, dy)
     bear = (np.degrees(np.arctan2(dx, dy)) + 360) % 360
     m = (dist < FUTURE_R) & (bear >= 100) & (bear <= 260) & (grow[own] > 0)
-    tops_fut[m] = base[own[m]] + G["maxh"][own[m]]
-    fut = kwh_per_kw(horizon_from(pts, tops_fut, x, y, eye)) if m.any() else now
+    if not m.any():
+        return (k, now, now, 0)
+    if not SLANT:
+        tops_fut[m] = base[own[m]] + G["maxh"][own[m]]
+        fut = kwh_per_kw(horizon_from(pts, tops_fut, x, y, eye))
+    else:
+        # 斜線：北側の境界は、その建物（外形）の北の端から BOUNDARY_SETBACK だけ北と置く（敷地の境界のデータがないため）
+        def sloped(p: np.ndarray, o: np.ndarray) -> np.ndarray:
+            lim = slant_limit(G["hd"][o], np.maximum(0.0, G["ymax"][o] + BOUNDARY_SETBACK - p[:, 1]))
+            # 今の建物より低くはならない（建て替えなければ、今の高さのまま残る）
+            return base[o] + np.maximum(top[o] - base[o], np.minimum(G["maxh"][o], lim))
+
+        tops_fut[m] = sloped(pts[m], own[m])
+        grown = np.unique(own[m])
+        iidx = np.concatenate([G["cell_in"].get((cell[0] + i, cell[1] + j), np.zeros(0, int)) for i in (-1, 0, 1) for j in (-1, 0, 1)])
+        iidx = iidx[np.isin(G["in_owner"][iidx], grown)]
+        ip, io = G["in_pts"][iidx], G["in_owner"][iidx]
+        # 外形は凸包なので、L字の建物などでは、この家と重なることがある。この家の敷地にあたる所には建たないので、
+        # この家の外形の大きさより近い点と、この家を外形の中に含む建物の内側の点は使わない（その建物は、外形の辺だけで見る）
+        keep = np.hypot(ip[:, 0] - x, ip[:, 1] - y) > G["rad"][k]
+        for j in grown:
+            hull = G["hulls"].get(int(j))
+            if hull is None:
+                continue
+            sign = 0.0
+            for i in range(len(hull)):
+                a, b = hull[i], hull[(i + 1) % len(hull)]
+                sign += np.sign((b[0] - a[0]) * (y - a[1]) - (b[1] - a[1]) * (x - a[0]))
+            if abs(sign) >= len(hull) - 1e-9:
+                keep &= io != j
+        ip, io = ip[keep], io[keep]
+        h_slant = horizon_from(np.concatenate([pts, ip]), np.concatenate([tops_fut, sloped(ip, io)]), x, y, eye)
+        # 斜線で切った形は、箱の中におさまる。箱のときの見上げ角（外形の辺だけで見る、これまでの計算）を超えないようにする
+        # （ごく近い建物では、内側の点を足すと、辺だけで見るより高く見えることがあるため）
+        tops_box = tops_now.copy()
+        tops_box[m] = base[own[m]] + G["maxh"][own[m]]
+        fut = kwh_per_kw(np.minimum(h_slant, horizon_from(pts, tops_box, x, y, eye)))
     n_vol = len(set(own[m].tolist()))
     return (k, now, fut, n_vol)
 
@@ -204,7 +257,38 @@ if __name__ == "__main__":
     for i, (px, py) in enumerate(geo["pts"]):
         cell_pts[(int(px // 60), int(py // 60))].append(i)
     cell_pts = {c: np.array(v) for c, v in cell_pts.items()}
-    g = {**geo, "cell_pts": cell_pts, "grow": grow, "maxh": mh}
+    # 斜線のための下準備：建物ごとの南北の端、高度地区の種類、高くなりうる建物の内側の点
+    n = len(rows)
+    ymin, ymax = np.full(n, np.inf), np.full(n, -np.inf)
+    np.minimum.at(ymin, geo["owner"], geo["pts"][:, 1])
+    np.maximum.at(ymax, geo["owner"], geo["pts"][:, 1])
+    hd = np.array([r.get("hd", 0) for r in rows])
+    if SLANT:
+        # 高くなりうる建物：斜線で切ったあとも、今より 3m 以上高くできるもの
+        grow = (effective_max(mh, hd, ymax - ymin, h) >= h + 3) & (h > 0) & np.isfinite(ymax)
+        print("growable buildings", int(grow.sum()), flush=True)
+    in_pts, in_owner = [np.zeros((0, 2))], [np.zeros(0, int)]
+    hulls: dict[int, np.ndarray] = {}
+    rad = np.zeros(n)
+    np.maximum.at(rad, geo["owner"], np.hypot(geo["pts"][:, 0] - geo["cx"][geo["owner"]], geo["pts"][:, 1] - geo["cy"][geo["owner"]]))
+    if SLANT:
+        order = np.argsort(geo["owner"], kind="stable")
+        starts = np.searchsorted(geo["owner"][order], np.arange(n + 1))
+        for k in np.flatnonzero(grow):
+            hull = convex_hull(geo["pts"][order[starts[k]:starts[k + 1]]])
+            if len(hull) >= 3:
+                hulls[int(k)] = hull
+                p = inner_grid(hull)
+                in_pts.append(p)
+                in_owner.append(np.full(len(p), k))
+    in_pts, in_owner = np.concatenate(in_pts), np.concatenate(in_owner).astype(int)
+    cell_in = defaultdict(list)
+    for i, (px, py) in enumerate(in_pts):
+        cell_in[(int(px // 60), int(py // 60))].append(i)
+    cell_in = {c: np.array(v) for c, v in cell_in.items()}
+    print("slant", SLANT, "inner points", len(in_pts), flush=True)
+    g = {**geo, "cell_pts": cell_pts, "grow": grow, "maxh": mh, "ymin": ymin, "ymax": ymax, "hd": hd,
+         "in_pts": in_pts, "in_owner": in_owner, "cell_in": cell_in, "hulls": hulls, "rad": rad}
     lats = [r["lat"] for r in rows]
     lons = [r["lon"] for r in rows]
     sun = prepare_sun(float(np.mean(lats)), float(np.mean(lons)))
@@ -237,6 +321,8 @@ if __name__ == "__main__":
     for key, d in shards.items():
         json.dump(d, open(out / f"{key}.json", "w"), separators=(",", ":"))
     meta = {"method": "簡易診断：PLATEAU の建物の外形・高さだけで、周りの建物の影を計算（木の影・屋根の形は含まない）",
+            "future": ("南側の建物が、容積率・用途地域・高度地区（最高限度と、北側からの斜線）の範囲でいちばん大きく建て替わった場合。"
+                       "道路斜線・隣地斜線・日影規制は含まない") if SLANT else "南側の建物が、ルール上の最大の高さの箱の形まで建て替わった場合（斜線は含まない）",
             "kwPerRoofM2": KW_PER_ROOF_M2, "openFactor": OPEN_FACTOR, "eyeDrop": EYE_DROP, "tilt": TILT, "azimuth": AZIMUTH,
             "houses": len(res), "fields": ["kW", "今の年間kWh", "将来の年間kWh", "今の1kWあたりkWh", "将来の1kWあたりkWh", "南側で高くなりうる建物の数"]}
     json.dump(meta, open(out / "meta.json", "w"), ensure_ascii=False, indent=1)

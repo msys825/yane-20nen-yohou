@@ -724,7 +724,9 @@ function HousePanel(props: {
           <More>
             <p>南側の建物が、ルールでいちばん高い姿に建て替わった場合です。実際にそこまで建つとは限りません。</p>
             {h.volumes.some((v) => v.reason) && h.volumes.slice(0, 5).map((v, i) => v.reason && <p key={i}>{azimuthLabel(v.bearing)} {Math.round(v.distance)}m：{v.reason}</p>)}
-            <p>最大の高さは容積率・建ぺい率・用途地域・高度地区からの目安です（斜線制限・日影規制・前面道路の幅は含みません）。</p>
+            <p>
+              高さは、容積率・建ぺい率・用途地域・高度地区からの目安です。高度地区の「北側からの斜線」まで入れているので、北側ほど低い形になります。北側の境界は、建物の北の端から1m北と置いています（道路斜線・隣地斜線・日影規制・前面道路の幅は含みません）。
+            </p>
           </More>
         </section>
 
@@ -811,8 +813,12 @@ function PairPanel({ pair, stage, onReveal, onBack }: { pair: Diagnosis[]; stage
   const rs = risky.southNeighbor;
   const ss = safe.southNeighbor;
   const floors = (h: number | null | undefined) => (h ? `${Math.round(h / 3)}階相当` : "");
-  const maxText = (n: Diagnosis["southNeighbor"]) =>
-    !n?.maxHeight ? "—" : n.nowHeight && n.maxHeight <= n.nowHeight + 1 ? `今と同じくらい（${floors(n.maxHeight)}）` : `${n.maxHeight}m（${floors(n.maxHeight)}）`;
+  // 南隣の最大：高度地区の斜線で切ったあとの、いちばん高い所
+  const top = (n: Diagnosis["southNeighbor"]) => n?.effHeight ?? n?.maxHeight;
+  const maxText = (n: Diagnosis["southNeighbor"]) => {
+    const m = top(n);
+    return !n || !m ? "—" : n.nowHeight && m <= n.nowHeight + 1 ? `今と同じくらい（${floors(m)}）` : `${m}m（${floors(m)}）`;
+  };
   return (
     <div className="space-y-4 p-5 text-sm">
       <BackLink onBack={onBack} />
@@ -902,9 +908,9 @@ function PairPanel({ pair, stage, onReveal, onBack }: { pair: Diagnosis[]; stage
           <p className="text-xs text-neutral-500">発電は1kWあたり・1年</p>
           <More>
             <p>
-              {risky.label}の南側：{rs?.zone}・容積率{rs?.floorAreaRate}%（{floors(rs?.maxHeight)}まで）。{safe.label}の南側：{ss?.zone}・容積率{ss?.floorAreaRate}%（{maxText(ss)}）。
+              {risky.label}の南側：{rs?.zone}・容積率{rs?.floorAreaRate}%（{floors(top(rs))}まで）。{safe.label}の南側：{ss?.zone}・容積率{ss?.floorAreaRate}%（{maxText(ss)}）。
             </p>
-            <p>最大の高さは目安です（斜線制限・日影規制は含みません）。実際にそこまで建つとは限りません。</p>
+            <p>最大の高さは目安です（高度地区の北側からの斜線まで入れています。道路斜線・隣地斜線・日影規制は含みません）。実際にそこまで建つとは限りません。</p>
           </More>
         </>
       )}

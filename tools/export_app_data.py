@@ -15,12 +15,12 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).parent))
 from future_shade import BuildingIndex, future_generation, hull_lonlat  # noqa: E402
 from plateau_tiles import read_batch_table  # noqa: E402
-from zoning import height_limits, max_buildable_height  # noqa: E402
+from zoning import effective_max, height_limits, max_buildable_height  # noqa: E402
 from roof_from_pc import fit_planes, obstacles_excluding, roof_points  # noqa: E402
 from solar_engine import load_weather  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "app/public/data/houses"
+OUT = Path(__import__("os").environ.get("HOUSES_OUT") or ROOT / "app/public/data/houses")  # 確かめ用に、別の場所へ書き出せる
 
 lod2_dir, crop_dir, index_path = sys.argv[1:4]
 houses = json.load(open(ROOT / "data/validation/houses.json"))
@@ -56,7 +56,11 @@ def south_neighbor(k: int) -> dict | None:
     r = index.rows[q]
     h_max, why = max_buildable_height(height_limits(r["lon"], r["lat"]), r.get("far"), r.get("cov"))
     zone = building_zone(q)
-    return {"gmlId": r["gml_id"], "usage": r["usage"], "storeys": r["st"], "nowHeight": r["h"], "maxHeight": h_max,
+    # 高度地区の斜線で切ったあとの、いちばん高い所
+    lat = [p[1] for p in hull_lonlat(index.triangles(q))[0]]
+    eff = None if h_max is None else round(float(effective_max(h_max, r.get("hd", 0), (max(lat) - min(lat)) * 110950, r["h"] or 0)), 1)
+    return {"gmlId": r["gml_id"], "usage": r["usage"], "storeys": r["st"], "nowHeight": r["h"], "maxHeight": h_max, "effHeight": eff,
+            "kind": r.get("hd", 0),
             "reason": why, "zone": zone, "floorAreaRate": r.get("far"), "coverageRate": r.get("cov"),
             "distance": round(float(d), 1), "bearing": round(b)}
 
@@ -79,6 +83,7 @@ for h in houses:
         vh, vbase = hull_lonlat(vt)
         volumes.append({"gmlId": v["gml_id"], "footprint": vh, "baseHeight": round(vbase, 2), "nowHeight": v["now_h"],
                         "maxHeight": v["max_h"], "reason": v["why"], "distance": v["distance_m"], "bearing": v["bearing"],
+                        "kind": v.get("kind", 0), "effHeight": v.get("eff_h", v["max_h"]),
                         "zone": building_zone(v["k"]) or v["zone"]})
     doc = {
         "no": int(no), "label": h.get("label"), "gmlId": h["gml_id"], "buildingId": h["bid"], "address": h["addr"],

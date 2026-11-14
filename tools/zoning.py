@@ -70,6 +70,30 @@ def height_limits(lon: float, lat: float) -> dict:
 
 FLOOR_HEIGHT = 3.0  # 1階あたりの高さ（m）
 
+# --- 高度地区の斜線（北側の境界からの、斜めの高さ制限） ---
+# 種類（第1種〜第3種）は、PLATEAU の建物の属性「高度地区」に入っている（都市計画決定情報の地図には、最高限度しか入っていない）
+BOUNDARY_SETBACK = 1.0  # 北側の敷地の境界は、建物（外形）の北の端からこれだけ北にあると置く [m]（敷地の境界のデータがないため）
+
+
+def slant_limit(kind, d):
+    """北側の境界から真北方向に d [m] 離れた所で、建ててよい高さ [m]（地盤面から）。kind・d は数でも numpy の配列でもよい
+    第1種：5 + 0.6d ／ 第2種：8m まで 5 + 1.25d、その先 15 + 0.6(d−8) ／ 第3種：8m まで 10 + 1.25d、その先 20 + 0.6(d−8)
+    種類が 0（不明・指定なし）の所は制限なし。出典：練馬区の高度地区の計画書（東京都の高度地区の標準の決まり）"""
+    import numpy as np
+
+    kind, d = np.asarray(kind), np.asarray(d, float)
+    a = np.where(kind == 3, 10.0, 5.0)
+    two_step = np.where(d <= 8, a + 1.25 * d, a + 10 + 0.6 * (d - 8))
+    lim = np.where(kind == 1, 5 + 0.6 * d, two_step)
+    return np.where(kind == 0, np.inf, lim)
+
+
+def effective_max(max_h, kind, depth, now_h=0.0):
+    """斜線で切ったあとの、いちばん高い所の高さ [m]。depth＝建物（外形）の南北の長さ [m]。今の高さより低くはしない"""
+    import numpy as np
+
+    return np.maximum(now_h, np.minimum(max_h, slant_limit(kind, np.asarray(depth, float) + BOUNDARY_SETBACK)))
+
 
 def max_buildable_height(limits: dict, far: float | None = None, cov: float | None = None) -> tuple[float | None, str]:
     """建ててよい最大の高さ（m）と、何で決まったかの説明。斜線制限・日影規制は含めない（最大の目安）"""
