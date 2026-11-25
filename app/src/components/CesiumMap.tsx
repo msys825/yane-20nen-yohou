@@ -7,6 +7,7 @@ import { slantSteps } from "@/lib/slant";
 import { loadCesium, type Cesium } from "@/lib/loadCesium";
 import { NERIMA_BLDG_LOD2_TILESET, toBuildingInfo, type BuildingInfo } from "@/lib/plateau";
 import { fetchDiagnosis, fetchListing, type Diagnosis } from "@/lib/diagnosis";
+import { installTrackpadControls } from "@/lib/trackpad";
 
 const GROW_MS = 2200; // 選んだ家の南側の建物が伸びきるまでの時間
 const CITY_GROW_MS = 4500; // 街全体が伸びきるまでの時間
@@ -280,7 +281,10 @@ export default function CesiumMap(props: Props) {
         }
       }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
+      const removeTrackpad = installTrackpadControls(Cesium, viewer, containerRef.current!, groundM);
+
       cleanup = () => {
+        removeTrackpad();
         handler.destroy();
         viewer.destroy();
         viewerRef.current = null;
