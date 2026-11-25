@@ -139,12 +139,13 @@ export default function CesiumMap(props: Props) {
           })
         : undefined;
 
-      // 背景地図：国土地理院 淡色地図（ズーム5〜18。ない段階を読みに行くと地図が表示されなくなる）
+      // 背景地図：国土地理院 淡色地図（ズーム5〜17。ない段階を読みに行くと地図が表示されなくなる）
+      // ズーム18は鉄道を濃い赤の線で描き、斜めから見ると赤い横じまに見えるので使わない
       const baseLayer = new Cesium.ImageryLayer(
         new Cesium.UrlTemplateImageryProvider({
           url: "https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png",
           minimumLevel: 5,
-          maximumLevel: 18,
+          maximumLevel: 17,
           credit: new Cesium.Credit("出典：国土地理院（地理院タイル）"),
         }),
       );
